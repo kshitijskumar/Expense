@@ -1,0 +1,82 @@
+-- Expense Table
+CREATE TABLE Expense (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    amount INTEGER NOT NULL,
+    date INTEGER NOT NULL,
+    category_id INTEGER NOT NULL,
+    notes TEXT,
+    FOREIGN KEY (category_id) REFERENCES Category(id) ON DELETE RESTRICT
+);
+
+-- Get all expenses with category information
+getAllExpenses:
+SELECT 
+    Expense.*,
+    Category.name AS category_name
+FROM Expense
+INNER JOIN Category ON Expense.category_id = Category.id
+ORDER BY Expense.date DESC;
+
+-- Get expenses by month (using date range)
+getExpensesByMonth:
+SELECT 
+    Expense.*,
+    Category.name AS category_name
+FROM Expense
+INNER JOIN Category ON Expense.category_id = Category.id
+WHERE Expense.date >= ? AND Expense.date < ?
+ORDER BY Expense.date DESC;
+
+-- Get expenses by category
+getExpensesByCategory:
+SELECT 
+    Expense.*,
+    Category.name AS category_name
+FROM Expense
+INNER JOIN Category ON Expense.category_id = Category.id
+WHERE Expense.category_id = ?
+ORDER BY Expense.date DESC;
+
+-- Get expense by ID
+getExpenseById:
+SELECT 
+    Expense.*,
+    Category.name AS category_name
+FROM Expense
+INNER JOIN Category ON Expense.category_id = Category.id
+WHERE Expense.id = ?;
+
+-- Insert a new expense
+insertExpense:
+INSERT INTO Expense (title, amount, date, category_id, notes)
+VALUES (?, ?, ?, ?, ?);
+
+-- Update an expense
+updateExpense:
+UPDATE Expense 
+SET title = ?, amount = ?, date = ?, category_id = ?, notes = ?
+WHERE id = ?;
+
+-- Delete an expense
+deleteExpense:
+DELETE FROM Expense WHERE id = ?;
+
+-- Get total expenses by month
+getTotalExpensesByMonth:
+SELECT SUM(amount) AS total
+FROM Expense
+WHERE date >= ? AND date < ?;
+
+-- Get category breakdown for a month
+getCategoryBreakdown:
+SELECT 
+    Category.id,
+    Category.name,
+    SUM(Expense.amount) AS total_amount,
+    COUNT(Expense.id) AS expense_count
+FROM Category
+LEFT JOIN Expense ON Category.id = Expense.category_id 
+    AND Expense.date >= ? AND Expense.date < ?
+GROUP BY Category.id, Category.name
+ORDER BY total_amount DESC;

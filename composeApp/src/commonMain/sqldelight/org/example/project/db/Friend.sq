@@ -1,0 +1,25 @@
+-- Friend Table
+CREATE TABLE Friend (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL
+);
+
+-- Get all friends
+getAllFriends:
+SELECT * FROM Friend;
+
+-- Get friend by ID
+getFriendById:
+SELECT * FROM Friend WHERE id = ?;
+
+-- Insert a new friend
+insertFriend:
+INSERT INTO Friend (name) VALUES (?);
+
+-- Update friend name
+updateFriend:
+UPDATE Friend SET name = ? WHERE id = ?;
+
+-- Delete a friend
+deleteFriend:
+DELETE FROM Friend WHERE id = ?;

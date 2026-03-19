@@ -1,0 +1,19 @@
+-- MonthlyBudget Table
+-- Stores overall monthly budget limit
+CREATE TABLE MonthlyBudget (
+    month TEXT PRIMARY KEY,
+    total_limit INTEGER NOT NULL
+);
+
+-- Get budget for a specific month
+getBudgetForMonth:
+SELECT * FROM MonthlyBudget WHERE month = ?;
+
+-- Insert or update (upsert) monthly budget
+insertOrUpdateBudget:
+INSERT OR REPLACE INTO MonthlyBudget (month, total_limit)
+VALUES (?, ?);
+
+-- Delete budget for a month
+deleteBudgetForMonth:
+DELETE FROM MonthlyBudget WHERE month = ?;
