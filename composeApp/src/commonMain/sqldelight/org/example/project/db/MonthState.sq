@@ -1,0 +1,23 @@
+-- MonthState Table
+-- Tracks whether a month has been settled/exported
+CREATE TABLE MonthState (
+    month TEXT PRIMARY KEY,
+    is_settled INTEGER NOT NULL DEFAULT 0
+);
+
+-- Get state for a specific month
+getMonthState:
+SELECT * FROM MonthState WHERE month = ?;
+
+-- Set month as settled or unsettled
+setMonthSettled:
+INSERT OR REPLACE INTO MonthState (month, is_settled)
+VALUES (?, ?);
+
+-- Get all settled months
+getAllSettledMonths:
+SELECT * FROM MonthState WHERE is_settled = 1 ORDER BY month DESC;
+
+-- Delete month state
+deleteMonthState:
+DELETE FROM MonthState WHERE month = ?;

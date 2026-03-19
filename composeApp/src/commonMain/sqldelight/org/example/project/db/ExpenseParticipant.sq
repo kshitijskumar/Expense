@@ -1,0 +1,73 @@
+-- ExpenseParticipant Junction Table
+-- Links expenses to friends (user participation is implicit, not stored)
+CREATE TABLE ExpenseParticipant (
+    expense_id INTEGER NOT NULL,
+    friend_id INTEGER NOT NULL,
+    PRIMARY KEY (expense_id, friend_id),
+    FOREIGN KEY (expense_id) REFERENCES Expense(id) ON DELETE CASCADE,
+    FOREIGN KEY (friend_id) REFERENCES Friend(id) ON DELETE CASCADE
+);
+
+-- Get all participants (friends) for an expense
+getParticipantsByExpense:
+SELECT 
+    Friend.*
+FROM Friend
+INNER JOIN ExpenseParticipant ON Friend.id = ExpenseParticipant.friend_id
+WHERE ExpenseParticipant.expense_id = ?;
+
+-- Get all expenses for a friend
+getExpensesByFriend:
+SELECT 
+    Expense.*,
+    Category.name AS category_name
+FROM Expense
+INNER JOIN Category ON Expense.category_id = Category.id
+INNER JOIN ExpenseParticipant ON Expense.id = ExpenseParticipant.expense_id
+WHERE ExpenseParticipant.friend_id = ?
+ORDER BY Expense.date DESC;
+
+-- Get expenses by friend within a date range
+getExpensesByFriendInMonth:
+SELECT 
+    Expense.*,
+    Category.name AS category_name
+FROM Expense
+INNER JOIN Category ON Expense.category_id = Category.id
+INNER JOIN ExpenseParticipant ON Expense.id = ExpenseParticipant.expense_id
+WHERE ExpenseParticipant.friend_id = ? 
+    AND Expense.date >= ? 
+    AND Expense.date < ?
+ORDER BY Expense.date DESC;
+
+-- Insert a participant
+insertParticipant:
+INSERT INTO ExpenseParticipant (expense_id, friend_id)
+VALUES (?, ?);
+
+-- Delete all participants for an expense (useful when updating participants)
+deleteParticipantsByExpense:
+DELETE FROM ExpenseParticipant WHERE expense_id = ?;
+
+-- Delete a specific participant from an expense
+deleteParticipant:
+DELETE FROM ExpenseParticipant WHERE expense_id = ? AND friend_id = ?;
+
+-- Calculate friend balances for a month
+-- For equal split: friend owes = total_expense / (participant_count + 1)
+-- The +1 accounts for the user who always participates
+getFriendBalances:
+SELECT 
+    Friend.id,
+    Friend.name,
+    SUM(
+        CAST(Expense.amount AS REAL) / (
+            (SELECT COUNT(*) FROM ExpenseParticipant ep WHERE ep.expense_id = Expense.id) + 1
+        )
+    ) AS amount_owed
+FROM Friend
+INNER JOIN ExpenseParticipant ON Friend.id = ExpenseParticipant.friend_id
+INNER JOIN Expense ON ExpenseParticipant.expense_id = Expense.id
+WHERE Expense.date >= ? AND Expense.date < ?
+GROUP BY Friend.id, Friend.name
+ORDER BY amount_owed DESC;

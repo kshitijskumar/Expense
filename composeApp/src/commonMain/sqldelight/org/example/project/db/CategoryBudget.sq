@@ -1,0 +1,40 @@
+-- CategoryBudget Table
+-- Stores per-category, per-month budget limits
+CREATE TABLE CategoryBudget (
+    month TEXT NOT NULL,
+    category_id INTEGER NOT NULL,
+    budget_limit INTEGER NOT NULL,
+    PRIMARY KEY (month, category_id),
+    FOREIGN KEY (category_id) REFERENCES Category(id) ON DELETE CASCADE
+);
+
+-- Get all category budgets for a specific month
+getCategoryBudgetsForMonth:
+SELECT 
+    CategoryBudget.*,
+    Category.name AS category_name
+FROM CategoryBudget
+INNER JOIN Category ON CategoryBudget.category_id = Category.id
+WHERE CategoryBudget.month = ?;
+
+-- Get specific category budget for a month
+getCategoryBudget:
+SELECT 
+    CategoryBudget.*,
+    Category.name AS category_name
+FROM CategoryBudget
+INNER JOIN Category ON CategoryBudget.category_id = Category.id
+WHERE CategoryBudget.month = ? AND CategoryBudget.category_id = ?;
+
+-- Insert or update (upsert) category budget
+insertOrUpdateCategoryBudget:
+INSERT OR REPLACE INTO CategoryBudget (month, category_id, budget_limit)
+VALUES (?, ?, ?);
+
+-- Delete a category budget
+deleteCategoryBudget:
+DELETE FROM CategoryBudget WHERE month = ? AND category_id = ?;
+
+-- Delete all category budgets for a month
+deleteCategoryBudgetsForMonth:
+DELETE FROM CategoryBudget WHERE month = ?;

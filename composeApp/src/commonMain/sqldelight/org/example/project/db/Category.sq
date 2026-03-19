@@ -1,0 +1,32 @@
+-- Category Table
+CREATE TABLE Category (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE
+);
+
+-- Pre-seed default categories
+INSERT INTO Category (name) VALUES 
+    ('Food'),
+    ('Travel'),
+    ('Groceries'),
+    ('Entertainment'),
+    ('Shopping'),
+    ('Bills'),
+    ('Health'),
+    ('Others');
+
+-- Get all categories
+getAllCategories:
+SELECT * FROM Category;
+
+-- Get category by ID
+getCategoryById:
+SELECT * FROM Category WHERE id = ?;
+
+-- Insert a new category
+insertCategory:
+INSERT INTO Category (name) VALUES (?);
+
+-- Delete a category (will fail if expenses reference it due to foreign key constraint)
+deleteCategory:
+DELETE FROM Category WHERE id = ?;
