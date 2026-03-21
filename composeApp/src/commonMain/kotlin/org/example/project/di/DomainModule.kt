@@ -1,7 +1,8 @@
 package org.example.project.di
 
+import org.example.project.domain.usecase.AddExpenseUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
-    // Use cases will be added here
+    factory { AddExpenseUseCase(get()) }
 }
