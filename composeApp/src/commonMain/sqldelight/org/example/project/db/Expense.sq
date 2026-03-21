@@ -52,6 +52,9 @@ insertExpense:
 INSERT INTO Expense (title, amount, date, category_id, notes)
 VALUES (?, ?, ?, ?, ?);
 
+lastInsertRowId:
+SELECT last_insert_rowid();
+
 -- Update an expense
 updateExpense:
 UPDATE Expense 
