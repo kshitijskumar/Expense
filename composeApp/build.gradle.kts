@@ -50,6 +50,7 @@ kotlin {
             implementation(libs.sqldelight.runtime)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
+            implementation(libs.koin.viewmodel)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native.driver)
