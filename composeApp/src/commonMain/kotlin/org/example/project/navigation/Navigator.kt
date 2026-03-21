@@ -1,0 +1,189 @@
+package org.example.project.navigation
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import org.koin.compose.koinInject
+
+@Composable
+fun Navigator(
+    navigationManager: NavigationManager = koinInject()
+) {
+    val navController = rememberNavController()
+
+    LaunchedEffect(navController, navigationManager) {
+        navigationManager.navigationEvents.collect { event ->
+            when (event) {
+                is NavigationEvent.NavigateTo -> {
+                    navController.navigate(event.screen)
+                }
+                is NavigationEvent.NavigateBack -> {
+                    navController.navigateUp()
+                }
+                is NavigationEvent.NavigateBackTo -> {
+                    navController.popBackStack(
+                        route = event.screen,
+                        inclusive = event.inclusive
+                    )
+                }
+                is NavigationEvent.ClearAndNavigate -> {
+                    navController.navigate(event.screen) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Home
+    ) {
+        composable<Screen.Home> {
+            ScreenPlaceholder(
+                title = "Home",
+                navigationManager = navigationManager,
+                showNavigationButtons = true
+            )
+        }
+
+        composable<Screen.AddExpense> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.AddExpense>()
+            ScreenPlaceholder(
+                title = "Add Expense",
+                subtitle = route.expenseId?.let { "Editing Expense ID: $it" } ?: "Adding New Expense",
+                navigationManager = navigationManager
+            )
+        }
+
+        composable<Screen.ExpenseDetail> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.ExpenseDetail>()
+            ScreenPlaceholder(
+                title = "Expense Detail",
+                subtitle = "Expense ID: ${route.expenseId}",
+                navigationManager = navigationManager
+            )
+        }
+
+        composable<Screen.Friends> {
+            ScreenPlaceholder(
+                title = "Friends",
+                navigationManager = navigationManager
+            )
+        }
+
+        composable<Screen.AddFriend> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.AddFriend>()
+            ScreenPlaceholder(
+                title = "Add Friend",
+                subtitle = route.friendId?.let { "Editing Friend ID: $it" } ?: "Adding New Friend",
+                navigationManager = navigationManager
+            )
+        }
+
+        composable<Screen.Categories> {
+            ScreenPlaceholder(
+                title = "Categories",
+                navigationManager = navigationManager
+            )
+        }
+
+        composable<Screen.MonthlyReport> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.MonthlyReport>()
+            ScreenPlaceholder(
+                title = "Monthly Report",
+                subtitle = "Month: ${route.month}",
+                navigationManager = navigationManager
+            )
+        }
+
+        composable<Screen.FriendBalance> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.FriendBalance>()
+            ScreenPlaceholder(
+                title = "Friend Balance",
+                subtitle = "Friend ID: ${route.friendId}",
+                navigationManager = navigationManager
+            )
+        }
+
+        composable<Screen.Settings> {
+            ScreenPlaceholder(
+                title = "Settings",
+                navigationManager = navigationManager
+            )
+        }
+    }
+}
+
+@Composable
+private fun ScreenPlaceholder(
+    title: String,
+    subtitle: String? = null,
+    navigationManager: NavigationManager,
+    showNavigationButtons: Boolean = false
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineLarge
+        )
+
+        subtitle?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+
+        if (showNavigationButtons) {
+            Button(onClick = { navigationManager.navigateTo(Screen.AddExpense()) }) {
+                Text("Add Expense")
+            }
+
+            Button(onClick = { navigationManager.navigateTo(Screen.ExpenseDetail(123)) }) {
+                Text("View Expense (ID: 123)")
+            }
+
+            Button(onClick = { navigationManager.navigateTo(Screen.Friends) }) {
+                Text("Friends")
+            }
+
+            Button(onClick = { navigationManager.navigateTo(Screen.Categories) }) {
+                Text("Categories")
+            }
+
+            Button(onClick = { navigationManager.navigateTo(Screen.MonthlyReport("2026-03")) }) {
+                Text("Monthly Report (March 2026)")
+            }
+
+            Button(onClick = { navigationManager.navigateTo(Screen.Settings) }) {
+                Text("Settings")
+            }
+        }
+
+        Button(onClick = { navigationManager.navigateBack() }) {
+            Text("Back")
+        }
+    }
+}
