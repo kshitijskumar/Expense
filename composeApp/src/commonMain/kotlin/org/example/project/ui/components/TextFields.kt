@@ -194,22 +194,7 @@ fun AppAmountTextField(
         maxLines = maxLines,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
-//        visualTransformation = VisualTransformation { original ->
-//            val textContainsCurrencySymbol = original.text.firstOrNull()?.equals('₹') == true
-//            val updatedText = if (!textContainsCurrencySymbol) {
-//                buildAnnotatedString {
-//                    append("₹ ")
-//                    append(original)
-//                }
-//            } else {
-//                original
-//            }
-//
-//            TransformedText(
-//                text = updatedText,
-//                offsetMapping = OffsetMapping.Identity
-//            )
-//        },
+        visualTransformation = CurrencyVisualTransformation(),
         interactionSource = interactionSource,
         shape = RoundedCornerShape(12.dp),
         colors = TextFieldDefaults.colors(

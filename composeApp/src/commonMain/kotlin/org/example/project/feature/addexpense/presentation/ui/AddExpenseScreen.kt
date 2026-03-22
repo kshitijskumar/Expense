@@ -150,6 +150,8 @@ fun AddExpenseScreen(
                     notes = state.notes,
                     onNotesChange = { viewModel.onIntent(AddExpenseIntent.NotesChanged(it)) }
                 )
+
+                Spacer(Modifier.height(32.dp))
             }
 
             // Save Button
