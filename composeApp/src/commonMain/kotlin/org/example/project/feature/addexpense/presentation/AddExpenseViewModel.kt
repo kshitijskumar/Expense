@@ -6,18 +6,22 @@ import org.example.project.domain.model.AddExpenseInput
 import org.example.project.domain.result.AddExpenseResult
 import org.example.project.feature.addexpense.domain.AddExpenseUseCase
 import org.example.project.feature.category.CategorySelector
+import org.example.project.feature.friend.FriendSelector
 import org.example.project.navigation.NavigationManager
 import org.example.project.ui.base.BaseViewModel
 
 class AddExpenseViewModel(
     private val addExpenseUseCase: AddExpenseUseCase,
     private val navigationManager: NavigationManager,
-    private val categorySelector: CategorySelector
+    private val categorySelector: CategorySelector,
+    private val friendSelector: FriendSelector
 ) : BaseViewModel<AddExpenseState, AddExpenseIntent>(AddExpenseState()) {
 
     init {
         categorySelector.initialise(viewModelScope)
+        friendSelector.initialise(viewModelScope)
         observeCategorySelection()
+        observeFriendSelection()
     }
 
     private fun observeCategorySelection() {
@@ -26,6 +30,14 @@ class AddExpenseViewModel(
                 selectorState.selectedCategory?.let { category ->
                     updateState { copy(selectedCategory = category) }
                 }
+            }
+        }
+    }
+
+    private fun observeFriendSelection() {
+        viewModelScope.launch {
+            friendSelector.state.collect { selectorState ->
+                updateState { copy(selectedFriends = selectorState.selectedFriends) }
             }
         }
     }
@@ -56,6 +68,21 @@ class AddExpenseViewModel(
             }
             AddExpenseIntent.CategorySearchCleared -> {
                 categorySelector.onClearSearch()
+            }
+            
+            is AddExpenseIntent.FriendSearchQueryChanged -> {
+                friendSelector.onSearchQueryChanged(intent.query)
+            }
+            is AddExpenseIntent.FriendToggled -> {
+                friendSelector.onFriendToggled(intent.friend)
+            }
+            AddExpenseIntent.FriendAddNewClicked -> {
+                viewModelScope.launch {
+                    friendSelector.onAddNewFriend()
+                }
+            }
+            AddExpenseIntent.FriendSearchCleared -> {
+                friendSelector.onClearSearch()
             }
         }
     }
@@ -104,7 +131,7 @@ class AddExpenseViewModel(
             date = state.value.date,
             category = selectedCategory,
             notes = state.value.notes.takeIf { it.isNotBlank() },
-            participantFriendIds = emptyList()
+            participantFriends = state.value.selectedFriends
         )
     }
 

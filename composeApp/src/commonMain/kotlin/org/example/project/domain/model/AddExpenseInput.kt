@@ -6,5 +6,5 @@ data class AddExpenseInput(
     val date: Long,
     val category: CategoryModel,
     val notes: String?,
-    val participantFriendIds: List<Long>
+    val participantFriends: List<FriendModel>
 )
