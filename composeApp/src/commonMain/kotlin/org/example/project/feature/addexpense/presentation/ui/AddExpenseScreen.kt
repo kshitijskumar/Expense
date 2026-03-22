@@ -18,6 +18,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,6 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import expense.composeapp.generated.resources.Res
+import expense.composeapp.generated.resources.ic_back
 import org.example.project.feature.addexpense.presentation.AddExpenseIntent
 import org.example.project.feature.addexpense.presentation.AddExpenseState
 import org.example.project.feature.addexpense.presentation.AddExpenseViewModel
@@ -44,8 +48,10 @@ import org.example.project.ui.components.CategoryChip
 import org.example.project.ui.components.DatePickerField
 import org.example.project.ui.components.FriendChip
 import org.example.project.ui.components.PrimaryButton
+import org.example.project.ui.components.SearchResultsDropdown
 import org.example.project.ui.components.SearchTextField
 import org.example.project.ui.theme.AppColors
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +62,7 @@ fun AddExpenseScreen(
     
     Scaffold(
         topBar = {
+            val backBtnSize = 24.dp
             TopAppBar(
                 title = {
                     Text(
@@ -65,12 +72,19 @@ fun AddExpenseScreen(
                     )
                         },
                 navigationIcon = {
-                    TextButton(onClick = { viewModel.onIntent(AddExpenseIntent.BackClicked) }) {
-                        Text("←")
+                    IconButton(
+                        onClick = { viewModel.onIntent(AddExpenseIntent.BackClicked) }
+                    ) {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_back),
+                            tint = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.size(backBtnSize),
+                            contentDescription = "Back"
+                        )
                     }
                 },
                 actions = {
-                    Spacer(Modifier.size(20.dp))
+                    Spacer(Modifier.size(backBtnSize))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = AppColors.current.background,
@@ -127,6 +141,7 @@ fun AddExpenseScreen(
                     state = state,
                     onCategorySelected = { viewModel.onIntent(AddExpenseIntent.CategorySelected(it)) },
                     onSearchQueryChange = { viewModel.onIntent(AddExpenseIntent.CategorySearchQueryChanged(it)) },
+                    onAddNew = { viewModel.onIntent(AddExpenseIntent.CategoryAddNewClicked) }
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -248,7 +263,8 @@ private fun TitleSection(
 private fun CategorySection(
     state: AddExpenseState,
     onCategorySelected: (org.example.project.domain.model.CategoryModel) -> Unit,
-    onSearchQueryChange: (String) -> Unit
+    onSearchQueryChange: (String) -> Unit,
+    onAddNew: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -278,12 +294,28 @@ private fun CategorySection(
         
         Spacer(modifier = Modifier.height(12.dp))
         
-        // Search field
-        SearchTextField(
-            value = state.categoryState.searchQuery,
-            onValueChange = onSearchQueryChange,
-            placeholder = "Search categories..."
-        )
+        // Search field with dropdown
+        Column(modifier = Modifier.fillMaxWidth()) {
+            SearchTextField(
+                value = state.categoryState.searchQuery,
+                onValueChange = onSearchQueryChange,
+                placeholder = "Search categories..."
+            )
+            
+            // Search results dropdown
+            SearchResultsDropdown(
+                query = state.categoryState.searchQuery,
+                results = state.categoryState.searchResults,
+                isVisible = true,
+                onItemClick = { category ->
+                    onCategorySelected(category)
+                },
+                onAddClick = onAddNew,
+                itemLabel = { it.name },
+                emptyResultsMessage = "No categories found",
+                addButtonText = "Add \"${state.categoryState.searchQuery}\""
+            )
+        }
     }
 }
 
@@ -305,29 +337,48 @@ private fun FriendsSection(
         
         Spacer(modifier = Modifier.height(12.dp))
         
-        // Friend chips
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            state.friendState.allFriends.take(6).forEach { friend ->
-                FriendChip(
-                    name = friend.name,
-                    isSelected = state.selectedFriends.any { it.id == friend.id },
-                    onClick = { onFriendToggled(friend) }
-                )
+        // Friend chips - only show if there are selected friends
+        if (state.selectedFriends.isNotEmpty()) {
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                maxItemsInEachRow = 3
+            ) {
+                state.selectedFriends.forEach { friend ->
+                    FriendChip(
+                        name = friend.name,
+                        isSelected = true,
+                        onClick = { onFriendToggled(friend) }
+                    )
+                }
             }
+            
+            Spacer(modifier = Modifier.height(12.dp))
         }
         
-        Spacer(modifier = Modifier.height(12.dp))
-        
-        // Search field
-        SearchTextField(
-            value = state.friendState.searchQuery,
-            onValueChange = onSearchQueryChange,
-            placeholder = "Search friends..."
-        )
+        // Search field with dropdown
+        Column(modifier = Modifier.fillMaxWidth()) {
+            SearchTextField(
+                value = state.friendState.searchQuery,
+                onValueChange = onSearchQueryChange,
+                placeholder = "Search friends..."
+            )
+            
+            // Search results dropdown
+            SearchResultsDropdown(
+                query = state.friendState.searchQuery,
+                results = state.friendState.searchResults,
+                isVisible = true,
+                onItemClick = { friend ->
+                    onFriendToggled(friend)
+                },
+                onAddClick = onAddNew,
+                itemLabel = { it.name },
+                emptyResultsMessage = "No friends found",
+                addButtonText = "Add \"${state.friendState.searchQuery}\""
+            )
+        }
         
         // Split preview
         if (state.selectedFriends.isNotEmpty() && state.amount.isNotBlank()) {
