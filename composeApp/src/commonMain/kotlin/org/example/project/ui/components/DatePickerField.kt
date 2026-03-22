@@ -3,11 +3,8 @@ package org.example.project.ui.components
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -20,11 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.example.project.ui.theme.AppColors
+import org.example.project.util.DateTimeUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,11 +94,12 @@ private fun formatDate(epochMillis: Long): String {
     val instant = Instant.fromEpochMilliseconds(epochMillis)
     val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
     
-    val now = Clock.System.now()
-        .toLocalDateTime(TimeZone.currentSystemDefault())
+    // Get today's date using platform-specific current timestamp
+    val todayInstant = Instant.fromEpochMilliseconds(DateTimeUtil.getCurrentTimeMillis())
+    val today = todayInstant.toLocalDateTime(TimeZone.currentSystemDefault())
     
     return when {
-        dateTime.date == now.date -> "Today"
+        dateTime.date == today.date -> "Today"
         else -> "${dateTime.dayOfMonth} ${dateTime.month.name}"
     }
 }
