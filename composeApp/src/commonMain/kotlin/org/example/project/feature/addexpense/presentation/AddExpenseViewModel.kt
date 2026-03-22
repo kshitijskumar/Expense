@@ -5,13 +5,30 @@ import kotlinx.coroutines.launch
 import org.example.project.domain.model.AddExpenseInput
 import org.example.project.domain.result.AddExpenseResult
 import org.example.project.feature.addexpense.domain.AddExpenseUseCase
+import org.example.project.feature.category.CategorySelector
 import org.example.project.navigation.NavigationManager
 import org.example.project.ui.base.BaseViewModel
 
 class AddExpenseViewModel(
     private val addExpenseUseCase: AddExpenseUseCase,
-    private val navigationManager: NavigationManager
+    private val navigationManager: NavigationManager,
+    private val categorySelector: CategorySelector
 ) : BaseViewModel<AddExpenseState, AddExpenseIntent>(AddExpenseState()) {
+
+    init {
+        categorySelector.initialise(viewModelScope)
+        observeCategorySelection()
+    }
+
+    private fun observeCategorySelection() {
+        viewModelScope.launch {
+            categorySelector.state.collect { selectorState ->
+                selectorState.selectedCategory?.let { category ->
+                    updateState { copy(selectedCategory = category) }
+                }
+            }
+        }
+    }
 
     override fun onIntent(intent: AddExpenseIntent) {
         when (intent) {
@@ -25,6 +42,21 @@ class AddExpenseViewModel(
             AddExpenseIntent.DatePickerDismissed -> updateState { copy(showDatePicker = false) }
             AddExpenseIntent.SaveClicked -> handleSave()
             AddExpenseIntent.BackClicked -> navigationManager.navigateBack()
+            
+            is AddExpenseIntent.CategorySearchQueryChanged -> {
+                categorySelector.onSearchQueryChanged(intent.query)
+            }
+            is AddExpenseIntent.CategorySelected -> {
+                categorySelector.onCategorySelected(intent.category)
+            }
+            AddExpenseIntent.CategoryAddNewClicked -> {
+                viewModelScope.launch {
+                    categorySelector.onAddNewCategory()
+                }
+            }
+            AddExpenseIntent.CategorySearchCleared -> {
+                categorySelector.onClearSearch()
+            }
         }
     }
 
@@ -63,11 +95,14 @@ class AddExpenseViewModel(
     }
 
     private fun mapToAddExpenseInput(): AddExpenseInput {
+        val selectedCategory = state.value.selectedCategory
+            ?: throw IllegalStateException("Category must be selected")
+        
         return AddExpenseInput(
             title = state.value.title,
             amount = convertToSmallestUnit(state.value.amount),
             date = state.value.date,
-            categoryId = 1L,
+            category = selectedCategory,
             notes = state.value.notes.takeIf { it.isNotBlank() },
             participantFriendIds = emptyList()
         )

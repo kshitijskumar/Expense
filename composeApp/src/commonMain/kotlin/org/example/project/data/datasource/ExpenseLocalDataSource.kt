@@ -14,7 +14,7 @@ class ExpenseLocalDataSource(private val db: DatabaseHelper) {
                 title = input.title,
                 amount = input.amount,
                 date = input.date,
-                category_id = input.categoryId,
+                category_id = input.category.id,
                 notes = input.notes
             )
             

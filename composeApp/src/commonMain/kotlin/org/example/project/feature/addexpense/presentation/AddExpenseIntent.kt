@@ -1,5 +1,7 @@
 package org.example.project.feature.addexpense.presentation
 
+import org.example.project.domain.model.CategoryModel
+
 sealed interface AddExpenseIntent {
     data class TitleChanged(val title: String) : AddExpenseIntent
     data class AmountChanged(val amount: String) : AddExpenseIntent
@@ -9,4 +11,9 @@ sealed interface AddExpenseIntent {
     data object DatePickerDismissed : AddExpenseIntent
     data object SaveClicked : AddExpenseIntent
     data object BackClicked : AddExpenseIntent
+    
+    data class CategorySearchQueryChanged(val query: String) : AddExpenseIntent
+    data class CategorySelected(val category: CategoryModel) : AddExpenseIntent
+    data object CategoryAddNewClicked : AddExpenseIntent
+    data object CategorySearchCleared : AddExpenseIntent
 }
