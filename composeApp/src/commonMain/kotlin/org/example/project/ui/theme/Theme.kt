@@ -1,9 +1,12 @@
 package org.example.project.ui.theme
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 private val Material3DarkColorScheme = darkColorScheme(
@@ -50,8 +53,15 @@ fun ExpenseTrackerTheme(
     CompositionLocalProvider(LocalAppColors provides DarkColorScheme) {
         MaterialTheme(
             colorScheme = Material3DarkColorScheme,
-            typography = AppTypography,
-            content = content
-        )
+            typography = AppTypography
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.onBackground
+            ) {
+                content()
+            }
+        }
     }
 }
