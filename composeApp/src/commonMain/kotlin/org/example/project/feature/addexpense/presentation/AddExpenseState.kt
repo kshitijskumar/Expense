@@ -19,4 +19,9 @@ data class AddExpenseState(
     val showDatePicker: Boolean = false,
     val categoryState: CategorySelectionState = CategorySelectionState(),
     val friendState: FriendSelectionState = FriendSelectionState()
-)
+) {
+    // Do not follow this pattern, this an exception since putting this in the state was missed in earlier phases
+    val enableSaveBtn: Boolean get() {
+        return !isLoading && amount.isNotBlank() && selectedCategory != null && title.isNotBlank()
+    }
+}

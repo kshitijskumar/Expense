@@ -28,7 +28,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -173,7 +175,7 @@ fun AddExpenseScreen(
             PrimaryButton(
                 text = "SAVE",
                 onClick = { viewModel.onIntent(AddExpenseIntent.SaveClicked) },
-                enabled = !state.isLoading && state.amount.isNotBlank() && state.selectedCategory != null,
+                enabled = state.enableSaveBtn,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
@@ -281,13 +283,32 @@ private fun CategorySection(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            maxItemsInEachRow = 3
         ) {
-            state.categoryState.basicCategories.forEach { category ->
+            val displayCategories by remember(state.categoryState) {
+                derivedStateOf {
+                    val output = state.categoryState.basicCategories.toMutableList()
+                    state.categoryState.recentlyAdded?.let { recentlyAdded ->
+                        output.add(recentlyAdded)
+                    }
+                    output
+                }
+            }
+            displayCategories.forEach { category ->
                 CategoryChip(
                     label = category.name,
                     isSelected = state.selectedCategory?.id == category.id,
                     onClick = { onCategorySelected(category) }
+                )
+            }
+
+            val selectedCategory = state.categoryState.selectedCategory
+            val basicContainsSelectedCategory = displayCategories.contains(selectedCategory)
+            if (!basicContainsSelectedCategory && selectedCategory != null) {
+                // user searched and added category separately
+                CategoryChip(
+                    label = selectedCategory.name,
+                    isSelected = state.selectedCategory?.id == selectedCategory.id,
+                    onClick = { onCategorySelected(selectedCategory) }
                 )
             }
         }
@@ -336,24 +357,22 @@ private fun FriendsSection(
         )
         
         Spacer(modifier = Modifier.height(12.dp))
-        
-        // Friend chips - only show if there are selected friends
-        if (state.selectedFriends.isNotEmpty()) {
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                maxItemsInEachRow = 3
-            ) {
-                state.selectedFriends.forEach { friend ->
-                    FriendChip(
-                        name = friend.name,
-                        isSelected = true,
-                        onClick = { onFriendToggled(friend) }
-                    )
-                }
+
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            state.friendState.allFriends.forEach { friend ->
+                FriendChip(
+                    name = friend.name,
+                    isSelected = state.friendState.selectedFriends.contains(friend),
+                    onClick = { onFriendToggled(friend) }
+                )
             }
-            
+        }
+
+        if (state.friendState.allFriends.isNotEmpty()) {
             Spacer(modifier = Modifier.height(12.dp))
         }
         
@@ -380,15 +399,15 @@ private fun FriendsSection(
             )
         }
         
-        // Split preview
-        if (state.selectedFriends.isNotEmpty() && state.amount.isNotBlank()) {
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            SplitPreview(
-                amount = state.amount,
-                friendCount = state.selectedFriends.size
-            )
-        }
+//        // Split preview
+//        if (state.selectedFriends.isNotEmpty() && state.amount.isNotBlank()) {
+//            Spacer(modifier = Modifier.height(12.dp))
+//
+//            SplitPreview(
+//                amount = state.amount,
+//                friendCount = state.selectedFriends.size
+//            )
+//        }
     }
 }
 
