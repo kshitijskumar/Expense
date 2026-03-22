@@ -23,7 +23,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -34,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -42,10 +42,8 @@ import expense.composeapp.generated.resources.ic_back
 import org.example.project.feature.addexpense.presentation.AddExpenseIntent
 import org.example.project.feature.addexpense.presentation.AddExpenseState
 import org.example.project.feature.addexpense.presentation.AddExpenseViewModel
-import org.example.project.ui.components.AddChip
 import org.example.project.ui.components.AppAmountTextField
 import org.example.project.ui.components.AppOutlinedTextField
-import org.example.project.ui.components.AppTextField
 import org.example.project.ui.components.CategoryChip
 import org.example.project.ui.components.DatePickerField
 import org.example.project.ui.components.FriendChip
@@ -255,7 +253,10 @@ private fun TitleSection(
         AppOutlinedTextField(
             value = title,
             onValueChange = onTitleChange,
-            placeholder = "Lunch with team"
+            placeholder = "Eg. Friday night dinner",
+            keyboardOptions = KeyboardOptions.Default.copy(
+                capitalization = KeyboardCapitalization.Sentences
+            )
         )
     }
 }
@@ -460,7 +461,10 @@ private fun NotesSection(
             onValueChange = onNotesChange,
             placeholder = "Add notes...",
             maxLines = 3,
-            singleLine = false
+            singleLine = false,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                capitalization = KeyboardCapitalization.Sentences
+            )
         )
     }
 }

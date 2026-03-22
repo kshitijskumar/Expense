@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
@@ -150,7 +151,10 @@ fun SearchTextField(
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+        keyboardOptions = KeyboardOptions.Default.copy(
+            capitalization = KeyboardCapitalization.Words,
+            keyboardType = KeyboardType.Text
+        )
     )
 }
 
