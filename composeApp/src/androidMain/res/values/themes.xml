@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Minimal theme - only handles system bars and window, Compose handles the rest -->
+    <style name="AppTheme" parent="android:Theme.Material.NoActionBar">
+        <!-- System bar colors to match our dark theme -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+        
+        <!-- Window background will be immediately replaced by Compose Surface -->
+        <item name="android:windowBackground">#FF121212</item>
+    </style>
+</resources>

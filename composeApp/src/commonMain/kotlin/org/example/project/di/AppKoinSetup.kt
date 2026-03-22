@@ -4,5 +4,6 @@ fun commonModules() = listOf(
     databaseModule,
     dataModule,
     domainModule,
-    navigationModule
+    navigationModule,
+    presentationModule
 )

@@ -14,16 +14,16 @@ class ExpenseLocalDataSource(private val db: DatabaseHelper) {
                 title = input.title,
                 amount = input.amount,
                 date = input.date,
-                category_id = input.categoryId,
+                category_id = input.category.id,
                 notes = input.notes
             )
             
             val expenseId = db.expenseQueries.lastInsertRowId().executeAsOne()
             
-            input.participantFriendIds.forEach { friendId ->
+            input.participantFriends.forEach { friend ->
                 db.expenseParticipantQueries.insertParticipant(
                     expense_id = expenseId,
-                    friend_id = friendId
+                    friend_id = friend.id
                 )
             }
         }

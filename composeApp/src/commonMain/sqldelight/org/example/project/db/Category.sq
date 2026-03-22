@@ -7,10 +7,11 @@ CREATE TABLE Category (
 -- Pre-seed default categories
 INSERT INTO Category (name) VALUES 
     ('Food'),
-    ('Travel'),
     ('Groceries'),
-    ('Entertainment'),
     ('Shopping'),
+    ('Entertainment'),
+    ('Utility'),
+    ('Travel'),
     ('Bills'),
     ('Health'),
     ('Others');
@@ -26,6 +27,11 @@ SELECT * FROM Category WHERE id = ?;
 -- Insert a new category
 insertCategory:
 INSERT INTO Category (name) VALUES (?);
+
+-- Get last inserted category ID
+lastInsertedCategory:
+SELECT * FROM Category 
+WHERE id = last_insert_rowid();
 
 -- Delete a category (will fail if expenses reference it due to foreign key constraint)
 deleteCategory:

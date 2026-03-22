@@ -16,6 +16,14 @@ SELECT * FROM Friend WHERE id = ?;
 insertFriend:
 INSERT INTO Friend (name) VALUES (?);
 
+-- Get last inserted friend
+lastInsertedFriend:
+SELECT * FROM Friend WHERE id = last_insert_rowid();
+
+-- Check if friend exists by name (case-insensitive)
+friendExistsByName:
+SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END FROM Friend WHERE LOWER(name) = LOWER(?);
+
 -- Update friend name
 updateFriend:
 UPDATE Friend SET name = ? WHERE id = ?;
