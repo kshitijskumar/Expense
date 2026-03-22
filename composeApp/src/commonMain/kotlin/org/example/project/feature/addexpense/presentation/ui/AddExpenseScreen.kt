@@ -1,0 +1,408 @@
+package org.example.project.feature.addexpense.presentation.ui
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import org.example.project.feature.addexpense.presentation.AddExpenseIntent
+import org.example.project.feature.addexpense.presentation.AddExpenseState
+import org.example.project.feature.addexpense.presentation.AddExpenseViewModel
+import org.example.project.ui.components.AddChip
+import org.example.project.ui.components.AppAmountTextField
+import org.example.project.ui.components.AppOutlinedTextField
+import org.example.project.ui.components.AppTextField
+import org.example.project.ui.components.CategoryChip
+import org.example.project.ui.components.DatePickerField
+import org.example.project.ui.components.FriendChip
+import org.example.project.ui.components.PrimaryButton
+import org.example.project.ui.components.SearchTextField
+import org.example.project.ui.theme.AppColors
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddExpenseScreen(
+    viewModel: AddExpenseViewModel
+) {
+    val state by viewModel.state.collectAsState()
+    
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Add Expense",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                        },
+                navigationIcon = {
+                    TextButton(onClick = { viewModel.onIntent(AddExpenseIntent.BackClicked) }) {
+                        Text("←")
+                    }
+                },
+                actions = {
+                    Spacer(Modifier.size(20.dp))
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.current.background,
+                    titleContentColor = AppColors.current.textPrimary,
+                    navigationIconContentColor = AppColors.current.textPrimary
+                )
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp)
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Amount Section
+                AmountSection(
+                    amount = state.amount,
+                    onAmountChange = { viewModel.onIntent(AddExpenseIntent.AmountChanged(it)) }
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Date Section
+                DateSection(
+                    selectedDate = state.date,
+                    showDatePicker = state.showDatePicker,
+                    onDatePickerShow = { viewModel.onIntent(AddExpenseIntent.DatePickerClicked) },
+                    onDatePickerDismiss = { viewModel.onIntent(AddExpenseIntent.DatePickerDismissed) },
+                    onDateSelected = { viewModel.onIntent(AddExpenseIntent.DateSelected(it)) }
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Title Section
+                TitleSection(
+                    title = state.title,
+                    onTitleChange = { viewModel.onIntent(AddExpenseIntent.TitleChanged(it)) }
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+                HorizontalDivider(color = AppColors.current.grid)
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Category Section
+                CategorySection(
+                    state = state,
+                    onCategorySelected = { viewModel.onIntent(AddExpenseIntent.CategorySelected(it)) },
+                    onSearchQueryChange = { viewModel.onIntent(AddExpenseIntent.CategorySearchQueryChanged(it)) },
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+                HorizontalDivider(color = AppColors.current.grid)
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Friends Section
+                FriendsSection(
+                    state = state,
+                    onFriendToggled = { viewModel.onIntent(AddExpenseIntent.FriendToggled(it)) },
+                    onSearchQueryChange = { viewModel.onIntent(AddExpenseIntent.FriendSearchQueryChanged(it)) },
+                    onAddNew = { viewModel.onIntent(AddExpenseIntent.FriendAddNewClicked) }
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+                HorizontalDivider(color = AppColors.current.grid)
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Notes Section
+                NotesSection(
+                    notes = state.notes,
+                    onNotesChange = { viewModel.onIntent(AddExpenseIntent.NotesChanged(it)) }
+                )
+            }
+
+            // Save Button
+            PrimaryButton(
+                text = "SAVE",
+                onClick = { viewModel.onIntent(AddExpenseIntent.SaveClicked) },
+                enabled = !state.isLoading && state.amount.isNotBlank() && state.selectedCategory != null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun AmountSection(
+    amount: String,
+    onAmountChange: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "How much?",
+            style = MaterialTheme.typography.bodyMedium,
+            color = AppColors.current.textSecondary
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+
+        AppAmountTextField(
+            value = amount,
+            onValueChange = onAmountChange,
+            modifier = Modifier.wrapContentWidth(),
+            placeholder = "₹ 0.0",
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            textStyle = MaterialTheme.typography.displayMedium
+        )
+    }
+}
+
+@Composable
+private fun DateSection(
+    selectedDate: Long,
+    showDatePicker: Boolean,
+    onDatePickerShow: () -> Unit,
+    onDatePickerDismiss: () -> Unit,
+    onDateSelected: (Long) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        DatePickerField(
+            selectedDate = selectedDate,
+            onDateSelected = onDateSelected,
+            showDatePicker = showDatePicker,
+            onShowDatePickerChange = { show ->
+                if (show) onDatePickerShow() else onDatePickerDismiss()
+            },
+            modifier = Modifier.width(140.dp)
+        )
+    }
+}
+
+@Composable
+private fun TitleSection(
+    title: String,
+    onTitleChange: (String) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "Title",
+            style = MaterialTheme.typography.titleMedium,
+            color = AppColors.current.textPrimary,
+            fontWeight = FontWeight.SemiBold
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        AppOutlinedTextField(
+            value = title,
+            onValueChange = onTitleChange,
+            placeholder = "Lunch with team"
+        )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun CategorySection(
+    state: AddExpenseState,
+    onCategorySelected: (org.example.project.domain.model.CategoryModel) -> Unit,
+    onSearchQueryChange: (String) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "Category",
+            style = MaterialTheme.typography.titleMedium,
+            color = AppColors.current.textPrimary,
+            fontWeight = FontWeight.SemiBold
+        )
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        // Category chips
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            maxItemsInEachRow = 3
+        ) {
+            state.categoryState.basicCategories.forEach { category ->
+                CategoryChip(
+                    label = category.name,
+                    isSelected = state.selectedCategory?.id == category.id,
+                    onClick = { onCategorySelected(category) }
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        // Search field
+        SearchTextField(
+            value = state.categoryState.searchQuery,
+            onValueChange = onSearchQueryChange,
+            placeholder = "Search categories..."
+        )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun FriendsSection(
+    state: AddExpenseState,
+    onFriendToggled: (org.example.project.domain.model.FriendModel) -> Unit,
+    onSearchQueryChange: (String) -> Unit,
+    onAddNew: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "Split with Friends (Optional)",
+            style = MaterialTheme.typography.titleMedium,
+            color = AppColors.current.textPrimary,
+            fontWeight = FontWeight.SemiBold
+        )
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        // Friend chips
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            state.friendState.allFriends.take(6).forEach { friend ->
+                FriendChip(
+                    name = friend.name,
+                    isSelected = state.selectedFriends.any { it.id == friend.id },
+                    onClick = { onFriendToggled(friend) }
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        // Search field
+        SearchTextField(
+            value = state.friendState.searchQuery,
+            onValueChange = onSearchQueryChange,
+            placeholder = "Search friends..."
+        )
+        
+        // Split preview
+        if (state.selectedFriends.isNotEmpty() && state.amount.isNotBlank()) {
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            SplitPreview(
+                amount = state.amount,
+                friendCount = state.selectedFriends.size
+            )
+        }
+    }
+}
+
+@Composable
+private fun SplitPreview(
+    amount: String,
+    friendCount: Int
+) {
+    val amountValue = amount.toDoubleOrNull() ?: 0.0
+    val splitAmount = if (friendCount > 0) amountValue / (friendCount + 1) else 0.0
+    
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "ℹ️",
+            style = MaterialTheme.typography.bodyMedium
+        )
+        
+        Spacer(modifier = Modifier.width(8.dp))
+        
+//        Text(
+//            text = "Split equally: Rs. %.2f each ($friendCount friend${if (friendCount > 1) "s" else ""})".format(splitAmount),
+//            style = MaterialTheme.typography.bodyMedium,
+//            color = AppColors.current.textSecondary
+//        )
+    }
+}
+
+@Composable
+private fun NotesSection(
+    notes: String,
+    onNotesChange: (String) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "Notes (Optional)",
+            style = MaterialTheme.typography.titleMedium,
+            color = AppColors.current.textPrimary,
+            fontWeight = FontWeight.SemiBold
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        AppOutlinedTextField(
+            value = notes,
+            onValueChange = onNotesChange,
+            placeholder = "Add notes...",
+            maxLines = 3,
+            singleLine = false
+        )
+    }
+}
+
+private fun getCategoryEmoji(categoryName: String): String {
+    return when (categoryName.lowercase()) {
+        "food" -> "🍔"
+        "travel" -> "🚗"
+        "groceries" -> "🛒"
+        "entertainment" -> "🎬"
+        "health" -> "🏥"
+        "shopping" -> "🛍️"
+        "bills" -> "📱"
+        "other" -> "📦"
+        else -> "💰"
+    }
+}

@@ -16,6 +16,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import org.example.project.feature.addexpense.presentation.AddExpenseViewModel
+import org.example.project.feature.addexpense.presentation.ui.AddExpenseScreen
+import org.example.project.feature.category.CategorySelector
+import org.example.project.feature.friend.FriendSelector
 import org.koin.compose.koinInject
 
 @Composable
@@ -63,12 +67,9 @@ fun Navigator(
         }
 
         composable<Screen.AddExpense> { backStackEntry ->
-            val route = backStackEntry.toRoute<Screen.AddExpense>()
-            ScreenPlaceholder(
-                title = "Add Expense",
-                subtitle = route.expenseId?.let { "Editing Expense ID: $it" } ?: "Adding New Expense",
-                navigationManager = navigationManager
-            )
+            val viewModel: AddExpenseViewModel = koinInject()
+            
+            AddExpenseScreen(viewModel = viewModel)
         }
 
         composable<Screen.ExpenseDetail> { backStackEntry ->

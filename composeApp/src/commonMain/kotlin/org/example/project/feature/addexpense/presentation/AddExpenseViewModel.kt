@@ -27,8 +27,11 @@ class AddExpenseViewModel(
     private fun observeCategorySelection() {
         viewModelScope.launch {
             categorySelector.state.collect { selectorState ->
-                selectorState.selectedCategory?.let { category ->
-                    updateState { copy(selectedCategory = category) }
+                updateState { 
+                    copy(
+                        selectedCategory = selectorState.selectedCategory,
+                        categoryState = selectorState
+                    ) 
                 }
             }
         }
@@ -37,7 +40,12 @@ class AddExpenseViewModel(
     private fun observeFriendSelection() {
         viewModelScope.launch {
             friendSelector.state.collect { selectorState ->
-                updateState { copy(selectedFriends = selectorState.selectedFriends) }
+                updateState { 
+                    copy(
+                        selectedFriends = selectorState.selectedFriends,
+                        friendState = selectorState
+                    ) 
+                }
             }
         }
     }
