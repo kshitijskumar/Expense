@@ -1,5 +1,6 @@
 package org.example.project.feature.home.domain.orchestrator
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -29,5 +30,5 @@ interface HomeComponentOrchestrator<T> {
      * This method starts the reactive chain - subscribing to data sources,
      * performing calculations, and emitting component states as data changes.
      */
-    suspend fun initialize()
+    fun initialize(scope: CoroutineScope)
 }

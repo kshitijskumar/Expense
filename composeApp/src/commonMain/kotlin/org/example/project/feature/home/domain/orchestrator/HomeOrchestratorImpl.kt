@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import org.example.project.domain.repository.ExpenseRepository
+import org.example.project.domain.repository.MonthlyBudgetRepository
 import org.example.project.feature.home.domain.model.HomeComponent
 import org.example.project.feature.home.domain.orchestrator.child.BudgetCardOrchestrator
 import org.example.project.feature.home.domain.orchestrator.child.DateHeaderOrchestrator
@@ -21,31 +23,36 @@ import org.example.project.feature.home.domain.orchestrator.child.TransactionLis
  * - Handles component-specific error strategies (critical vs optional)
  * - Automatically rebuilds component list when any child state changes
  */
-class HomeOrchestratorImpl : HomeOrchestrator {
+class HomeOrchestratorImpl(
+    private val expenseRepository: ExpenseRepository,
+    private val budgetRepository: MonthlyBudgetRepository
+) : HomeOrchestrator {
     
     private val dateOrchestrator = DateHeaderOrchestrator()
-    private val budgetOrchestrator = BudgetCardOrchestrator()
-    private val transactionOrchestrator = TransactionListOrchestrator()
+    private val budgetOrchestrator = BudgetCardOrchestrator(expenseRepository, budgetRepository)
+    private val transactionOrchestrator = TransactionListOrchestrator(expenseRepository)
     
     private val _homeComponents = MutableStateFlow<List<HomeComponent>>(emptyList())
     override val homeComponents: StateFlow<List<HomeComponent>> = _homeComponents.asStateFlow()
     
-    override suspend fun initialize() {
+    override suspend fun initialize(scope: CoroutineScope) {
         // Initialize all child orchestrators
-        dateOrchestrator.initialize()
-        budgetOrchestrator.initialize()
-        transactionOrchestrator.initialize()
+        dateOrchestrator.initialize(scope)
+        budgetOrchestrator.initialize(scope)
+        transactionOrchestrator.initialize(scope)
         
         // Combine all child states reactively
         // Whenever any child state changes, rebuild the component list
-        combine(
-            flow = dateOrchestrator.componentState,
-            flow2 = budgetOrchestrator.componentState,
-            flow3 = transactionOrchestrator.componentState
-        ) { dateHeader, budgetCard, transactionComponent ->
-            buildComponentList(dateHeader, budgetCard, transactionComponent)
-        }.collect { components ->
-            _homeComponents.value = components
+        scope.launch {
+            combine(
+                dateOrchestrator.componentState,
+                budgetOrchestrator.componentState,
+                transactionOrchestrator.componentState
+            ) { dateHeader, budgetCard, transactionComponent ->
+                buildComponentList(dateHeader, budgetCard, transactionComponent)
+            }.collect { components ->
+                _homeComponents.value = components
+            }
         }
     }
     
@@ -54,7 +61,7 @@ class HomeOrchestratorImpl : HomeOrchestrator {
      * 
      * Priority order:
      * 1. Date Header - Always shown if available
-     * 2. Budget Card - Critical component
+     * 2. Budget Card - Skip if null (no budget set)
      * 3. Transaction List - Optional component, skips if null
      */
     private fun buildComponentList(
@@ -67,10 +74,8 @@ class HomeOrchestratorImpl : HomeOrchestrator {
         // Priority 1: Date Header (always show if available)
         dateHeader?.let { components.add(it) }
         
-        // Priority 2: Budget Card
-        if (budgetCard != null) {
-            components.add(budgetCard)
-        }
+        // Priority 2: Budget Card (skip if null - no budget set)
+        budgetCard?.let { components.add(it) }
         
         // Priority 3: Transaction List (optional - skip if null)
         transactionComponent?.let { components.add(it) }

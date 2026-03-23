@@ -1,5 +1,6 @@
 package org.example.project.feature.home.domain.orchestrator
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import org.example.project.feature.home.domain.model.HomeComponent
 
@@ -25,6 +26,9 @@ interface HomeOrchestrator {
     /**
      * Initialize orchestrator and all child orchestrators.
      * 
+     * @param scope CoroutineScope for managing child orchestrator lifecycles.
+     *              Managed by ViewModel - will be cancelled when VM is cleared.
+     * 
      * This starts the reactive chain:
      * 1. Initializes all child orchestrators
      * 2. Combines their state flows
@@ -32,5 +36,5 @@ interface HomeOrchestrator {
      * 
      * Should be called once during ViewModel initialization.
      */
-    suspend fun initialize()
+    suspend fun initialize(scope: CoroutineScope)
 }

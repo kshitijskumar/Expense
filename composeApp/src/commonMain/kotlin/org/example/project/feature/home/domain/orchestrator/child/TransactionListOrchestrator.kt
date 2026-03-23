@@ -4,66 +4,58 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import org.example.project.domain.model.CategoryModel
-import org.example.project.domain.model.ExpenseSummaryModel
+import org.example.project.domain.repository.ExpenseRepository
 import org.example.project.feature.home.domain.model.HomeComponent
 import org.example.project.feature.home.domain.orchestrator.HomeComponentOrchestrator
+import org.example.project.util.DateTimeUtil
 
 /**
  * Orchestrator for the transaction list component.
- * Provides list of transactions for the latest transaction date,
+ * Reactively provides list of transactions for the latest transaction date,
  * or empty state if no transactions exist.
  */
-class TransactionListOrchestrator : HomeComponentOrchestrator<HomeComponent> {
+class TransactionListOrchestrator(
+    private val expenseRepository: ExpenseRepository
+) : HomeComponentOrchestrator<HomeComponent> {
     
     private val _componentState = MutableStateFlow<HomeComponent?>(null)
     override val componentState: StateFlow<HomeComponent?> = _componentState.asStateFlow()
     
-    override suspend fun initialize() {
-        // TODO: Replace with actual repository calls
-        // Mock data: Create sample transactions
-        val transactions = createMockTransactions()
+    override fun initialize(scope: CoroutineScope) {
+        scope.launch {
+            try {
+                // Reactively observe latest transaction date
+                expenseRepository.getLatestTransactionDateFlow()
+                    .flatMapLatest { latestDate ->
+                        if (latestDate == null) {
+                            flowOf((latestDate to listOf()))
+                        } else {
+                            // Once we have a date, reactively observe transactions for that day
+                            val startOfDay = DateTimeUtil.getStartOfDay(latestDate)
+                            val endOfDay = DateTimeUtil.getEndOfDay(latestDate)
 
-        _componentState.value = if (transactions.isEmpty()) {
-            HomeComponent.EmptyTransactions
-        } else {
-            HomeComponent.TransactionList(
-                date = "23 March", // Mock date
-                transactions = transactions
-            )
+                            expenseRepository.getExpensesByDateFlow(startOfDay, endOfDay)
+                                .map { (latestDate to it) }
+                        }
+                    }
+                    .collect { (latestDate, transactions) ->
+                        _componentState.value = if ( latestDate == null || transactions.isEmpty()) {
+                            HomeComponent.EmptyTransactions
+                        } else {
+                            HomeComponent.TransactionList(
+                                date = DateTimeUtil.formatDateHeader(latestDate),
+                                transactions = transactions
+                            )
+                        }
+                    }
+            } catch (e: Exception) {
+                _componentState.value = null
+            }
         }
-    }
-    
-    private fun createMockTransactions(): List<ExpenseSummaryModel> {
-        // Mock: Create 2 sample transactions
-        return listOf(
-            ExpenseSummaryModel(
-                id = 1L,
-                title = "Blinkit",
-                amount = 24300L, // Rs. 243 in paise
-                date = System.currentTimeMillis(),
-                category = CategoryModel(
-                    id = 1L,
-                    name = "Groceries",
-                    budgetLimit = null
-                ),
-                participantCount = 2,
-                notes = null
-            ),
-            ExpenseSummaryModel(
-                id = 2L,
-                title = "Lunch at Cafe",
-                amount = 45000L, // Rs. 450 in paise
-                date = System.currentTimeMillis(),
-                category = CategoryModel(
-                    id = 2L,
-                    name = "Food",
-                    budgetLimit = null
-                ),
-                participantCount = 3,
-                notes = "Team lunch"
-            )
-        )
     }
 }
