@@ -3,8 +3,14 @@ package org.example.project.feature.home.domain.orchestrator
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * Interface for child component orchestrators.
- * Each orchestrator is responsible for managing a single home component's state.
+ * Interface for home component orchestrators.
+ * Each orchestrator is responsible for managing a single component's state
+ * and performing all necessary calculations and data transformations.
+ * 
+ * These act as data providers for their specific component, encapsulating
+ * all logic needed to produce the component's display data.
+ * 
+ * @param T The data type this orchestrator produces
  */
 interface HomeComponentOrchestrator<T> {
     
@@ -20,8 +26,8 @@ interface HomeComponentOrchestrator<T> {
      * Initialize the orchestrator and start collecting data.
      * Should be called once when orchestrator is created.
      * 
-     * This method starts the reactive chain - subscribing to data sources
-     * and emitting component states as data changes.
+     * This method starts the reactive chain - subscribing to data sources,
+     * performing calculations, and emitting component states as data changes.
      */
-    fun initialize()
+    suspend fun initialize()
 }

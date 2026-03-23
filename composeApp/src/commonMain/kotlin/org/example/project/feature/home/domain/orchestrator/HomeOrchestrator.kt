@@ -32,5 +32,5 @@ interface HomeOrchestrator {
      * 
      * Should be called once during ViewModel initialization.
      */
-    fun initialize()
+    suspend fun initialize()
 }
