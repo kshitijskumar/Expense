@@ -51,6 +51,7 @@ import org.example.project.ui.components.PrimaryButton
 import org.example.project.ui.components.SearchResultsDropdown
 import org.example.project.ui.components.SearchTextField
 import org.example.project.ui.theme.AppColors
+import org.example.project.util.CurrencyUtil.INR_CURRENCY_SYMBOL
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -203,7 +204,7 @@ private fun AmountSection(
             value = amount,
             onValueChange = onAmountChange,
             modifier = Modifier.wrapContentWidth(),
-            placeholder = "₹ 0.0",
+            placeholder = "${INR_CURRENCY_SYMBOL} 0.0",
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             textStyle = MaterialTheme.typography.displayMedium

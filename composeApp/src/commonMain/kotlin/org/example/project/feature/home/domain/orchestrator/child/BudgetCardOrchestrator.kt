@@ -40,7 +40,7 @@ class BudgetCardOrchestrator(
                         HomeComponent.BudgetCard(
                             monthlySpend = monthlySpend,
                             monthlyBudget = monthlyBudget,
-                            progress = 100f,
+                            progress = 1f,
                             isOverBudget = false
                         )
                     } else {
