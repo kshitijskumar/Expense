@@ -4,9 +4,10 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import org.example.project.util.CurrencyUtil.INR_CURRENCY_SYMBOL
 
 class CurrencyVisualTransformation(
-    private val currencySymbol: String = "₹ "
+    private val currencySymbol: String = "$INR_CURRENCY_SYMBOL "
 ) : VisualTransformation {
     
     override fun filter(text: AnnotatedString): TransformedText {
