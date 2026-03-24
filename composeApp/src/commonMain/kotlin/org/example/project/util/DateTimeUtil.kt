@@ -14,7 +14,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
-// Keep platform-specific time function
+/** Platform clock; kept as extension on [DateTimeUtil] so call sites import `getCurrentTimeMillis`. */
 expect fun DateTimeUtil.getCurrentTimeMillis(): Long
 
 object DateTimeUtil {
