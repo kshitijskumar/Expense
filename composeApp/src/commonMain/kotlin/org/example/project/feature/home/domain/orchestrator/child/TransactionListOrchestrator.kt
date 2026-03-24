@@ -1,3 +1,5 @@
+@file:OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+
 package org.example.project.feature.home.domain.orchestrator.child
 
 import kotlinx.coroutines.CoroutineScope

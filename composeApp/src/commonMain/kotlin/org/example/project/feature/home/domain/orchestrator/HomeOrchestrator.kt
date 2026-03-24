@@ -36,5 +36,5 @@ interface HomeOrchestrator {
      * 
      * Should be called once during ViewModel initialization.
      */
-    suspend fun initialize(scope: CoroutineScope)
+    fun initialize(scope: CoroutineScope)
 }

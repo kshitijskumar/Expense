@@ -35,7 +35,7 @@ class HomeOrchestratorImpl(
     private val _homeComponents = MutableStateFlow<List<HomeComponent>>(emptyList())
     override val homeComponents: StateFlow<List<HomeComponent>> = _homeComponents.asStateFlow()
     
-    override suspend fun initialize(scope: CoroutineScope) {
+    override fun initialize(scope: CoroutineScope) {
         // Initialize all child orchestrators
         dateOrchestrator.initialize(scope)
         budgetOrchestrator.initialize(scope)
