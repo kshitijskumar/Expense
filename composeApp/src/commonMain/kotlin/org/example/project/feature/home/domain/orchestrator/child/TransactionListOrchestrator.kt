@@ -15,6 +15,10 @@ import org.example.project.domain.repository.ExpenseRepository
 import org.example.project.feature.home.domain.model.HomeComponent
 import org.example.project.feature.home.domain.orchestrator.HomeComponentOrchestrator
 import org.example.project.util.DateTimeUtil
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import org.example.project.util.getCurrentTimeMillis
 
 /**
  * Orchestrator for the transaction list component.
@@ -49,8 +53,10 @@ class TransactionListOrchestrator(
                         _componentState.value = if ( latestDate == null || transactions.isEmpty()) {
                             HomeComponent.EmptyTransactions
                         } else {
+                            // Format date as "Today", "Yesterday", or "DD MMMM"
+                            val dateLabel = formatTransactionDate(latestDate)
                             HomeComponent.TransactionList(
-                                date = DateTimeUtil.formatDateHeader(latestDate),
+                                date = dateLabel,
                                 transactions = transactions
                             )
                         }
@@ -58,6 +64,23 @@ class TransactionListOrchestrator(
             } catch (e: Exception) {
                 _componentState.value = null
             }
+        }
+    }
+
+    /**
+     * Formats transaction date as "Today", "Yesterday", or "DD MMMM"
+     */
+    private fun formatTransactionDate(timestamp: Long): String {
+        val instant = Instant.fromEpochMilliseconds(timestamp)
+        val transactionDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+        val nowInstant = Instant.fromEpochMilliseconds(DateTimeUtil.getCurrentTimeMillis())
+        val todayDate = nowInstant.toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+        return when {
+            transactionDate == todayDate -> "Today"
+            transactionDate.dayOfYear == todayDate.dayOfYear - 1 && transactionDate.year == todayDate.year -> "Yesterday"
+            else -> DateTimeUtil.formatDateHeader(timestamp)
         }
     }
 }

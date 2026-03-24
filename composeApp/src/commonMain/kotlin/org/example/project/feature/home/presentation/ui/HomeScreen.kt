@@ -35,6 +35,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.example.project.domain.model.ExpenseSummaryModel
 import org.example.project.feature.home.domain.model.HomeComponent
@@ -80,7 +81,7 @@ fun HomeScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(
                         items = state.components,
@@ -150,18 +151,18 @@ private fun BudgetCardComponent(component: HomeComponent.BudgetCard) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
                     text = "Spent this month",
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelLarge,
                     color = colors.textSecondary
                 )
                 Text(
                     text = CurrencyUtil.toDisplayAmount(component.monthlySpend),
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.headlineMedium,
                     color = colors.textPrimary
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Monthly budget",
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelLarge,
                     color = colors.textSecondary
                 )
                 Text(
@@ -170,7 +171,7 @@ private fun BudgetCardComponent(component: HomeComponent.BudgetCard) {
                     } else {
                         "—"
                     },
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.headlineMedium,
                     color = colors.textPrimary
                 )
             }
@@ -235,15 +236,16 @@ private fun TransactionListComponent(
     component: HomeComponent.TransactionList,
     onExpenseClick: (Long) -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column {
         Text(
             text = component.date,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
             color = AppColors.current.textSecondary
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         component.transactions.forEach { tx ->
             TransactionRow(tx = tx, onClick = { onExpenseClick(tx.id) })
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }
@@ -258,47 +260,58 @@ private fun TransactionRow(tx: ExpenseSummaryModel, onClick: () -> Unit) {
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = colors.surface)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+                .padding(horizontal = 12.dp, vertical = 12.dp)
         ) {
-            // Left: title + category chip
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            // Row 1: title and amount
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = tx.title,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = colors.textPrimary,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = CurrencyUtil.toDisplayAmount(tx.amount),
+                    style = MaterialTheme.typography.titleMedium,
                     color = colors.textPrimary
                 )
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // Row 2: category chip and participant info
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Category chip with yellow background and black text
                 Surface(
-                    shape = RoundedCornerShape(4.dp),
-                    color = colors.surfaceVariant
+                    shape = RoundedCornerShape(6.dp),
+                    color = colors.primary
                 ) {
                     Text(
                         text = tx.category.name,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = colors.textSecondary,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        style = MaterialTheme.typography.labelMedium,
+                        color = colors.onPrimary,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                     )
                 }
-            }
 
-            // Right: amount + participant count
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = CurrencyUtil.toDisplayAmount(tx.amount),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = colors.textPrimary
-                )
+                // Participant count
                 if (tx.participantCount > 0) {
                     Text(
                         text = "with ${tx.participantCount} others",
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = colors.textSecondary
                     )
                 }
@@ -317,7 +330,7 @@ private fun EmptyTransactionsComponent() {
     ) {
         Text(
             text = "No transactions yet",
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             color = AppColors.current.textSecondary
         )
     }
@@ -333,7 +346,7 @@ private fun ErrorCardComponent(component: HomeComponent.ErrorCard) {
     ) {
         Text(
             text = "${component.componentType}: ${component.message}",
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             color = colors.error,
             modifier = Modifier.padding(12.dp)
         )
