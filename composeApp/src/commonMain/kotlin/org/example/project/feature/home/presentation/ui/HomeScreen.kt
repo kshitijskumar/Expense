@@ -1,8 +1,10 @@
 package org.example.project.feature.home.presentation.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -50,7 +52,9 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(state.components, key = { componentKey(it) }) { component ->
-                    HomeComponentRow(component)
+                    HomeComponentRow(component, onExpenseClick = { expenseId ->
+                        viewModel.onIntent(HomeIntent.NavigateToExpenseDetail(expenseId))
+                    })
                 }
             }
         }
@@ -82,7 +86,7 @@ private fun componentKey(component: HomeComponent): String {
 }
 
 @Composable
-private fun HomeComponentRow(component: HomeComponent) {
+private fun HomeComponentRow(component: HomeComponent, onExpenseClick: (Long) -> Unit) {
     when (component) {
         is HomeComponent.DateHeader -> {
             Text(
@@ -109,7 +113,11 @@ private fun HomeComponentRow(component: HomeComponent) {
                 component.transactions.forEach { tx ->
                     Text(
                         text = "${tx.title} · ${tx.amount} · ${tx.category.name}",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onExpenseClick(tx.id) }
+                            .padding(vertical = 4.dp)
                     )
                 }
             }

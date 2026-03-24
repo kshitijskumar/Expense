@@ -30,6 +30,7 @@ class HomeViewModel(
         when (intent) {
             HomeIntent.Refresh -> { /* Orchestrator refresh TBD; avoid duplicate initialize */ }
             HomeIntent.NavigateToAddExpense -> navigationManager.navigateTo(Screen.AddExpense())
+            is HomeIntent.NavigateToExpenseDetail -> navigationManager.navigateTo(Screen.ExpenseDetail(intent.expenseId))
         }
     }
 }
