@@ -7,8 +7,9 @@ object CurrencyUtil {
 
     /**
      * Converts minor currency units (e.g. paise) to a display string with rupees and paise.
-     * 560000 → "₹ 5,600.00"
-     * 42200 → "₹ 422.00"
+     * 560000 → "₹ 5,600"
+     * 42250 → "₹ 422.50"
+     * 42200 → "₹ 422"
      */
     fun toDisplayAmount(minor: Long): String {
         val isNegative = minor < 0
@@ -25,7 +26,8 @@ object CurrencyUtil {
         }.reversed()
 
         val sign = if (isNegative) "-" else ""
-        return "$INR_CURRENCY_SYMBOL $sign$formattedRupees.${absPaise.toString().padStart(2, '0')}"
+        val paiseText = if (absPaise != 0L) ".${absPaise.toString().padStart(2, '0')}" else ""
+        return "$INR_CURRENCY_SYMBOL $sign$formattedRupees$paiseText"
     }
 
     /**
