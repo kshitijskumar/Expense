@@ -83,3 +83,17 @@ LEFT JOIN Expense ON Category.id = Expense.category_id
     AND Expense.date >= ? AND Expense.date < ?
 GROUP BY Category.id, Category.name
 ORDER BY total_amount DESC;
+
+-- Get the most recent transaction date
+getLatestTransactionDate:
+SELECT MAX(date) FROM Expense;
+
+-- Get all expenses for a specific date range (for a single day)
+getExpensesByDate:
+SELECT 
+    Expense.*,
+    Category.name AS category_name
+FROM Expense
+INNER JOIN Category ON Expense.category_id = Category.id
+WHERE Expense.date >= ? AND Expense.date < ?
+ORDER BY Expense.date DESC;

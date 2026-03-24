@@ -18,6 +18,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import org.example.project.feature.addexpense.presentation.AddExpenseViewModel
 import org.example.project.feature.addexpense.presentation.ui.AddExpenseScreen
+import org.example.project.feature.home.presentation.HomeViewModel
+import org.example.project.feature.home.presentation.ui.HomeScreen
 import org.example.project.feature.category.CategorySelector
 import org.example.project.feature.friend.FriendSelector
 import org.koin.compose.koinInject
@@ -59,11 +61,8 @@ fun Navigator(
         startDestination = Screen.Home
     ) {
         composable<Screen.Home> {
-            ScreenPlaceholder(
-                title = "Home",
-                navigationManager = navigationManager,
-                showNavigationButtons = true
-            )
+            val homeViewModel: HomeViewModel = koinInject()
+            HomeScreen(viewModel = homeViewModel, navigationManager = navigationManager)
         }
 
         composable<Screen.AddExpense> { backStackEntry ->

@@ -1,6 +1,3 @@
 package org.example.project.util
 
-
-actual object DateTimeUtil {
-    actual fun getCurrentTimeMillis(): Long = System.currentTimeMillis()
-}
+actual fun DateTimeUtil.getCurrentTimeMillis(): Long = System.currentTimeMillis()
