@@ -14,16 +14,19 @@ import org.example.project.feature.friend.FriendSelector
 import org.example.project.navigation.NavigationManager
 import org.example.project.navigation.Screen
 import org.example.project.ui.base.BaseViewModel
+import org.example.project.util.CurrencyUtil
 
 class EditExpenseViewModel(
-    val expenseId: Long,
+    args: Screen.EditExpense,
     private val getExpenseUseCase: GetExpenseUseCase,
     private val updateExpenseUseCase: UpdateExpenseUseCase,
     private val deleteExpenseUseCase: DeleteExpenseUseCase,
     private val navigationManager: NavigationManager,
     private val categorySelector: CategorySelector,
     private val friendSelector: FriendSelector
-) : BaseViewModel<EditExpenseState, EditExpenseIntent>(EditExpenseState(expenseId = expenseId)) {
+) : BaseViewModel<EditExpenseState, EditExpenseIntent>(EditExpenseState(expenseId = args.expenseId)) {
+
+    private val expenseId: Long = args.expenseId
 
     init {
         categorySelector.initialise(viewModelScope)
@@ -46,11 +49,9 @@ class EditExpenseViewModel(
                         copy(
                             originalExpense = expense,
                             title = expense.title,
-                            amount = convertFromSmallestUnit(expense.amount),
+                            amount = CurrencyUtil.toFormAmount(expense.amount),
                             date = expense.date,
                             notes = expense.notes ?: "",
-                            selectedCategory = expense.category,
-                            selectedFriends = expense.participants,
                             isLoading = false
                         )
                     }
@@ -75,12 +76,7 @@ class EditExpenseViewModel(
     private fun observeCategorySelection() {
         viewModelScope.launch {
             categorySelector.state.collect { selectorState ->
-                updateState {
-                    copy(
-                        selectedCategory = selectorState.selectedCategory,
-                        categoryState = selectorState
-                    )
-                }
+                updateState { copy(categoryState = selectorState) }
             }
         }
     }
@@ -88,12 +84,7 @@ class EditExpenseViewModel(
     private fun observeFriendSelection() {
         viewModelScope.launch {
             friendSelector.state.collect { selectorState ->
-                updateState {
-                    copy(
-                        selectedFriends = selectorState.selectedFriends,
-                        friendState = selectorState
-                    )
-                }
+                updateState { copy(friendState = selectorState) }
             }
         }
     }
@@ -205,30 +196,11 @@ class EditExpenseViewModel(
 
         return AddExpenseInput(
             title = state.value.title,
-            amount = convertToSmallestUnit(state.value.amount),
+            amount = CurrencyUtil.toMinorUnits(state.value.amount),
             date = state.value.date,
             category = selectedCategory,
             notes = state.value.notes.takeIf { it.isNotBlank() },
             participantFriends = state.value.selectedFriends
         )
-    }
-
-    private fun convertToSmallestUnit(amountString: String): Long {
-        if (amountString.isBlank()) return 0L
-
-        val amountDouble = amountString.toDoubleOrNull() ?: 0.0
-        // Multiply by 100 to convert rupees to paise (or dollars to cents)
-        return (amountDouble * 100).toLong()
-    }
-
-    private fun convertFromSmallestUnit(amount: Long): String {
-        // Convert from paise/cents to rupees/dollars
-        // e.g., 12550 paise -> "125.50"
-        val amountDouble = amount / 100.0
-        return if (amountDouble == amountDouble.toLong().toDouble()) {
-            amountDouble.toLong().toString()
-        } else {
-            String.format("%.2f", amountDouble).trimEnd('0').trimEnd('.')
-        }
     }
 }

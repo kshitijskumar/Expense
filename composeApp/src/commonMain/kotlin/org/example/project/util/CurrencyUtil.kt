@@ -33,8 +33,10 @@ object CurrencyUtil {
     /**
      * Converts a user-entered string (e.g. "56.00") to minor units (paise).
      * "56" → 5600
+     * "" → 0
      */
     fun toMinorUnits(amount: String): Long {
+        if (amount.isBlank()) return 0L
         return (amount.toDoubleOrNull() ?: 0.0).times(INR_CONVERSION).toLong()
     }
 
@@ -44,5 +46,22 @@ object CurrencyUtil {
      */
     fun toCurrency(minor: Long): Double {
         return minor / INR_CONVERSION
+    }
+
+    /**
+     * Converts minor units to a form input string (for editing).
+     * 12550 paise → "125.50"
+     * 12500 paise → "125"
+     * Strips unnecessary trailing zeros and decimal point.
+     */
+    fun toFormAmount(minor: Long): String {
+        val rupees = minor / INR_CONVERSION.toInt()
+        val paise = minor % INR_CONVERSION.toInt()
+
+        return when {
+            paise == 0 -> rupees.toString()
+            paise < 10 -> "$rupees.0$paise"
+            else -> "$rupees.$paise"
+        }
     }
 }

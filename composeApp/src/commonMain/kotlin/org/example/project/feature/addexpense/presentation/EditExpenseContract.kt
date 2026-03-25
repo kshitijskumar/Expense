@@ -15,8 +15,6 @@ data class EditExpenseState(
     val amount: String = "",
     val date: Long = Clock.System.now().toEpochMilliseconds(),
     val notes: String = "",
-    val selectedCategory: CategoryModel? = null,
-    val selectedFriends: List<FriendModel> = emptyList(),
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
     val isDeleting: Boolean = false,
@@ -26,6 +24,10 @@ data class EditExpenseState(
     val categoryState: CategorySelectionState = CategorySelectionState(),
     val friendState: FriendSelectionState = FriendSelectionState()
 ) {
+    // Access category and friends from their respective selector states
+    val selectedCategory: CategoryModel? get() = categoryState.selectedCategory
+    val selectedFriends: List<FriendModel> get() = friendState.selectedFriends
+
     val enableSaveBtn: Boolean get() {
         return !isSaving && !isLoading && amount.isNotBlank() && selectedCategory != null && title.isNotBlank()
     }

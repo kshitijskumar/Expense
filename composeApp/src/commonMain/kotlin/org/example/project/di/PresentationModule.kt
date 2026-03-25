@@ -13,9 +13,9 @@ val presentationModule = module {
     viewModelOf(::AddExpenseViewModel)
     viewModelOf(::HomeViewModel)
 
-    factory { (expenseId: Long) ->
+    factory { (args: org.example.project.navigation.Screen.EditExpense) ->
         EditExpenseViewModel(
-            expenseId = expenseId,
+            args = args,
             getExpenseUseCase = get(),
             updateExpenseUseCase = get(),
             deleteExpenseUseCase = get(),
