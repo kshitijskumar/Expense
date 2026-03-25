@@ -157,7 +157,7 @@ private fun ScreenPlaceholder(
         }
 
         if (showNavigationButtons) {
-            Button(onClick = { navigationManager.navigateTo(Screen.AddExpense()) }) {
+            Button(onClick = { navigationManager.navigateTo(Screen.AddExpense) }) {
                 Text("Add Expense")
             }
 

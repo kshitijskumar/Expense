@@ -59,7 +59,7 @@ object CurrencyUtil {
         val paise = minor % INR_CONVERSION.toInt()
 
         return when {
-            paise == 0 -> rupees.toString()
+            paise == 0L -> rupees.toString()
             paise < 10 -> "$rupees.0$paise"
             else -> "$rupees.$paise"
         }
