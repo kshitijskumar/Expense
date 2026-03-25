@@ -17,12 +17,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import org.example.project.feature.addexpense.presentation.AddExpenseViewModel
+import org.example.project.feature.addexpense.presentation.EditExpenseViewModel
 import org.example.project.feature.addexpense.presentation.ui.AddExpenseScreen
+import org.example.project.feature.addexpense.presentation.ui.EditExpenseScreen
 import org.example.project.feature.home.presentation.HomeViewModel
 import org.example.project.feature.home.presentation.ui.HomeScreen
 import org.example.project.feature.category.CategorySelector
 import org.example.project.feature.friend.FriendSelector
 import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun Navigator(
@@ -65,10 +68,15 @@ fun Navigator(
             HomeScreen(viewModel = homeViewModel, navigationManager = navigationManager)
         }
 
-        composable<Screen.AddExpense> { backStackEntry ->
+        composable<Screen.AddExpense> {
             val viewModel: AddExpenseViewModel = koinInject()
-            
             AddExpenseScreen(viewModel = viewModel)
+        }
+
+        composable<Screen.EditExpense> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.EditExpense>()
+            val viewModel: EditExpenseViewModel = koinInject { parametersOf(route) }
+            EditExpenseScreen(viewModel = viewModel)
         }
 
         composable<Screen.ExpenseDetail> { backStackEntry ->

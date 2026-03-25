@@ -69,7 +69,11 @@ fun EditExpenseScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { viewModel.onIntent(EditExpenseIntent.DeleteClicked) }
+                        onClick = {
+                            if (!state.isSaving && !state.isDeleting) {
+                                viewModel.onIntent(EditExpenseIntent.DeleteClicked)
+                            }
+                        }
                     ) {
                         Icon(
                             painter = painterResource(Res.drawable.ic_delete),
@@ -116,39 +120,15 @@ fun EditExpenseScreen(
                 modifier = Modifier.weight(1f)
             )
 
-            // Save and Delete Buttons
-            Row(
+            // Save Button
+            PrimaryButton(
+                text = if (state.isSaving) "SAVING..." else "SAVE",
+                onClick = { viewModel.onIntent(EditExpenseIntent.SaveClicked) },
+                enabled = state.enableSaveBtn && !state.isDeleting && !state.isSaving,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Delete Button
-                Button(
-                    onClick = { viewModel.onIntent(EditExpenseIntent.DeleteClicked) },
-                    enabled = !state.isDeleting && !state.isSaving,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(0.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.error
-                    )
-                ) {
-                    Text(
-                        if (state.isDeleting) "DELETING..." else "DELETE",
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
-
-                // Save Button
-                PrimaryButton(
-                    text = if (state.isSaving) "SAVING..." else "SAVE",
-                    onClick = { viewModel.onIntent(EditExpenseIntent.SaveClicked) },
-                    enabled = state.enableSaveBtn && !state.isDeleting && !state.isSaving,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+                    .padding(16.dp)
+            )
         }
     }
 
