@@ -79,15 +79,6 @@ fun Navigator(
             EditExpenseScreen(viewModel = viewModel)
         }
 
-        composable<Screen.ExpenseDetail> { backStackEntry ->
-            val route = backStackEntry.toRoute<Screen.ExpenseDetail>()
-            ScreenPlaceholder(
-                title = "Expense Detail",
-                subtitle = "Expense ID: ${route.expenseId}",
-                navigationManager = navigationManager
-            )
-        }
-
         composable<Screen.Friends> {
             ScreenPlaceholder(
                 title = "Friends",
@@ -169,8 +160,8 @@ private fun ScreenPlaceholder(
                 Text("Add Expense")
             }
 
-            Button(onClick = { navigationManager.navigateTo(Screen.ExpenseDetail(123)) }) {
-                Text("View Expense (ID: 123)")
+            Button(onClick = { navigationManager.navigateTo(Screen.EditExpense(123)) }) {
+                Text("Edit Expense (ID: 123)")
             }
 
             Button(onClick = { navigationManager.navigateTo(Screen.Friends) }) {

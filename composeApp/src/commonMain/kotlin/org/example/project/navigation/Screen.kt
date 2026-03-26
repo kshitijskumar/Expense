@@ -14,9 +14,6 @@ sealed interface Screen {
     data class EditExpense(val expenseId: Long) : Screen
 
     @Serializable
-    data class ExpenseDetail(val expenseId: Long) : Screen
-    
-    @Serializable
     data object Friends : Screen
     
     @Serializable
