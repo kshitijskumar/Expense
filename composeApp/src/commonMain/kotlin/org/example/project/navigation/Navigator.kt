@@ -106,6 +106,7 @@ fun Navigator(
         composable<Screen.MonthlyReport> { backStackEntry ->
             val route = backStackEntry.toRoute<Screen.MonthlyReport>()
             MonthlyReportScreen(
+                year = route.year,
                 month = route.month,
                 navigationManager = navigationManager
             )
@@ -172,7 +173,7 @@ private fun ScreenPlaceholder(
                 Text("Categories")
             }
 
-            Button(onClick = { navigationManager.navigateTo(Screen.MonthlyReport("2026-03")) }) {
+            Button(onClick = { navigationManager.navigateTo(Screen.MonthlyReport(year = 2026, month = 3)) }) {
                 Text("Monthly Report (March 2026)")
             }
 

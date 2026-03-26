@@ -10,6 +10,7 @@ import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
 import kotlinx.datetime.minus
+import kotlinx.datetime.number
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
@@ -36,6 +37,12 @@ object DateTimeUtil {
         val now = Instant.fromEpochMilliseconds(getCurrentTimeMillis())
         val localDate = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
         return "${localDate.year}-${localDate.monthNumber.toString().padStart(2, '0')}"
+    }
+
+    fun getYearMonthFromTimestamp(timestamp: Long): Pair<Int, Int> {
+        val instant = Instant.fromEpochMilliseconds(timestamp)
+        val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
+        return Pair(localDate.year, localDate.month.number)
     }
 
     fun getMonthStartTimestamp(month: String): Long {

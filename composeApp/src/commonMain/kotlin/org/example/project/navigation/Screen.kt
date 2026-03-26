@@ -23,7 +23,7 @@ sealed interface Screen {
     data object Categories : Screen
     
     @Serializable
-    data class MonthlyReport(val month: String) : Screen
+    data class MonthlyReport(val year: Int, val month: Int) : Screen
     
     @Serializable
     data class FriendBalance(val friendId: Long) : Screen

@@ -26,7 +26,8 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MonthlyReportScreen(
-    month: String,
+    year: Int,
+    month: Int,
     navigationManager: NavigationManager
 ) {
     Scaffold(
@@ -70,7 +71,7 @@ fun MonthlyReportScreen(
                 style = MaterialTheme.typography.headlineLarge
             )
             Text(
-                text = "Month: $month",
+                text = "Month: ${year}-${month.toString().padStart(2, '0')}",
                 style = MaterialTheme.typography.bodyLarge
             )
             Text(
