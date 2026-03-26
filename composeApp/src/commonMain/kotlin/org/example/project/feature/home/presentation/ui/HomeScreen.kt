@@ -91,6 +91,9 @@ fun HomeScreen(
                             component = component,
                             onExpenseClick = { expenseId ->
                                 viewModel.onIntent(HomeIntent.NavigateToExpenseDetail(expenseId))
+                            },
+                            onViewAllClick = {
+                                viewModel.onIntent(HomeIntent.NavigateToViewAllTransactions)
                             }
                         )
                     }
@@ -111,11 +114,15 @@ private fun componentKey(component: HomeComponent): String {
 }
 
 @Composable
-private fun HomeComponentRow(component: HomeComponent, onExpenseClick: (Long) -> Unit) {
+private fun HomeComponentRow(
+    component: HomeComponent,
+    onExpenseClick: (Long) -> Unit,
+    onViewAllClick: () -> Unit
+) {
     when (component) {
         is HomeComponent.DateHeader -> DateHeaderComponent(component)
         is HomeComponent.BudgetCard -> BudgetCardComponent(component)
-        is HomeComponent.TransactionList -> TransactionListComponent(component, onExpenseClick)
+        is HomeComponent.TransactionList -> TransactionListComponent(component, onExpenseClick, onViewAllClick)
         HomeComponent.EmptyTransactions -> EmptyTransactionsComponent()
         is HomeComponent.ErrorCard -> ErrorCardComponent(component)
     }
@@ -234,15 +241,28 @@ private fun BudgetCardComponent(component: HomeComponent.BudgetCard) {
 @Composable
 private fun TransactionListComponent(
     component: HomeComponent.TransactionList,
-    onExpenseClick: (Long) -> Unit
+    onExpenseClick: (Long) -> Unit,
+    onViewAllClick: () -> Unit
 ) {
     Column {
-        Text(
-            text = component.date,
-            style = MaterialTheme.typography.titleLarge,
-            color = AppColors.current.textSecondary
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = component.date,
+                style = MaterialTheme.typography.titleLarge,
+                color = AppColors.current.textSecondary
+            )
+            Text(
+                text = "View all",
+                style = MaterialTheme.typography.titleMedium,
+                color = AppColors.current.primary,
+                modifier = Modifier.clickable { onViewAllClick() }
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
         component.transactions.forEach { tx ->
             TransactionRow(tx = tx, onClick = { onExpenseClick(tx.id) })
             Spacer(modifier = Modifier.height(12.dp))

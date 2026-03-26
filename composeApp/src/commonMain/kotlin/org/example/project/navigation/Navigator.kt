@@ -22,6 +22,7 @@ import org.example.project.feature.addexpense.presentation.ui.AddExpenseScreen
 import org.example.project.feature.addexpense.presentation.ui.EditExpenseScreen
 import org.example.project.feature.home.presentation.HomeViewModel
 import org.example.project.feature.home.presentation.ui.HomeScreen
+import org.example.project.feature.monthlyreport.presentation.ui.MonthlyReportScreen
 import org.example.project.feature.category.CategorySelector
 import org.example.project.feature.friend.FriendSelector
 import org.koin.compose.koinInject
@@ -104,9 +105,8 @@ fun Navigator(
 
         composable<Screen.MonthlyReport> { backStackEntry ->
             val route = backStackEntry.toRoute<Screen.MonthlyReport>()
-            ScreenPlaceholder(
-                title = "Monthly Report",
-                subtitle = "Month: ${route.month}",
+            MonthlyReportScreen(
+                month = route.month,
                 navigationManager = navigationManager
             )
         }
