@@ -6,13 +6,13 @@ import kotlinx.serialization.Serializable
 sealed interface Screen {
     @Serializable
     data object Home : Screen
-    
+
     @Serializable
-    data class AddExpense(val expenseId: Long? = null) : Screen
-    
+    data object AddExpense : Screen
+
     @Serializable
-    data class ExpenseDetail(val expenseId: Long) : Screen
-    
+    data class EditExpense(val expenseId: Long) : Screen
+
     @Serializable
     data object Friends : Screen
     

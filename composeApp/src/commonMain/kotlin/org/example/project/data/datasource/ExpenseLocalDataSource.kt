@@ -11,7 +11,9 @@ import kotlinx.coroutines.withContext
 import org.example.project.db.DatabaseHelper
 import org.example.project.domain.model.AddExpenseInput
 import org.example.project.domain.model.CategoryModel
+import org.example.project.domain.model.ExpenseDetailModel
 import org.example.project.domain.model.ExpenseSummaryModel
+import org.example.project.domain.model.FriendModel
 
 class ExpenseLocalDataSource(private val db: DatabaseHelper) {
 
@@ -33,6 +35,61 @@ class ExpenseLocalDataSource(private val db: DatabaseHelper) {
                     friend_id = friend.id
                 )
             }
+        }
+    }
+
+    suspend fun getExpenseById(expenseId: Long): ExpenseDetailModel? = withContext(Dispatchers.IO) {
+        val expense = db.expenseQueries.getExpenseById(expenseId).executeAsOneOrNull() ?: return@withContext null
+
+        val participants = db.expenseParticipantQueries.getParticipantsByExpense(expenseId)
+            .executeAsList()
+            .map { friendRow ->
+                FriendModel(
+                    id = friendRow.id,
+                    name = friendRow.name
+                )
+            }
+
+        ExpenseDetailModel(
+            id = expense.id,
+            title = expense.title,
+            amount = expense.amount,
+            date = expense.date,
+            category = CategoryModel(
+                id = expense.category_id,
+                name = expense.category_name
+            ),
+            participants = participants,
+            notes = expense.notes
+        )
+    }
+
+    suspend fun updateExpense(expenseId: Long, input: AddExpenseInput) = withContext(Dispatchers.IO) {
+        db.database.transaction {
+            db.expenseQueries.updateExpense(
+                id = expenseId,
+                title = input.title,
+                amount = input.amount,
+                date = input.date,
+                category_id = input.category.id,
+                notes = input.notes
+            )
+
+            db.expenseParticipantQueries.deleteParticipantsByExpense(expenseId)
+
+            input.participantFriends.forEach { friend ->
+                db.expenseParticipantQueries.insertParticipant(
+                    expense_id = expenseId,
+                    friend_id = friend.id
+                )
+            }
+        }
+    }
+
+    suspend fun deleteExpense(expenseId: Long) = withContext(Dispatchers.IO) {
+        db.database.transaction {
+            db.expenseParticipantQueries.deleteParticipantsByExpense(expenseId)
+            db.expenseQueries.deleteExpense(expenseId)
         }
     }
 

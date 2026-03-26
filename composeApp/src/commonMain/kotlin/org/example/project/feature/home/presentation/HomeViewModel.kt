@@ -29,8 +29,8 @@ class HomeViewModel(
     override fun onIntent(intent: HomeIntent) {
         when (intent) {
             HomeIntent.Refresh -> { /* Orchestrator refresh TBD; avoid duplicate initialize */ }
-            HomeIntent.NavigateToAddExpense -> navigationManager.navigateTo(Screen.AddExpense())
-            is HomeIntent.NavigateToExpenseDetail -> navigationManager.navigateTo(Screen.ExpenseDetail(intent.expenseId))
+            HomeIntent.NavigateToAddExpense -> navigationManager.navigateTo(Screen.AddExpense)
+            is HomeIntent.NavigateToExpenseDetail -> navigationManager.navigateTo(Screen.EditExpense(intent.expenseId))
         }
     }
 }

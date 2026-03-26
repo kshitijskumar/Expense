@@ -17,12 +17,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import org.example.project.feature.addexpense.presentation.AddExpenseViewModel
+import org.example.project.feature.addexpense.presentation.EditExpenseViewModel
 import org.example.project.feature.addexpense.presentation.ui.AddExpenseScreen
+import org.example.project.feature.addexpense.presentation.ui.EditExpenseScreen
 import org.example.project.feature.home.presentation.HomeViewModel
 import org.example.project.feature.home.presentation.ui.HomeScreen
 import org.example.project.feature.category.CategorySelector
 import org.example.project.feature.friend.FriendSelector
 import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun Navigator(
@@ -65,19 +68,15 @@ fun Navigator(
             HomeScreen(viewModel = homeViewModel, navigationManager = navigationManager)
         }
 
-        composable<Screen.AddExpense> { backStackEntry ->
+        composable<Screen.AddExpense> {
             val viewModel: AddExpenseViewModel = koinInject()
-            
             AddExpenseScreen(viewModel = viewModel)
         }
 
-        composable<Screen.ExpenseDetail> { backStackEntry ->
-            val route = backStackEntry.toRoute<Screen.ExpenseDetail>()
-            ScreenPlaceholder(
-                title = "Expense Detail",
-                subtitle = "Expense ID: ${route.expenseId}",
-                navigationManager = navigationManager
-            )
+        composable<Screen.EditExpense> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.EditExpense>()
+            val viewModel: EditExpenseViewModel = koinInject { parametersOf(route) }
+            EditExpenseScreen(viewModel = viewModel)
         }
 
         composable<Screen.Friends> {
@@ -157,12 +156,12 @@ private fun ScreenPlaceholder(
         }
 
         if (showNavigationButtons) {
-            Button(onClick = { navigationManager.navigateTo(Screen.AddExpense()) }) {
+            Button(onClick = { navigationManager.navigateTo(Screen.AddExpense) }) {
                 Text("Add Expense")
             }
 
-            Button(onClick = { navigationManager.navigateTo(Screen.ExpenseDetail(123)) }) {
-                Text("View Expense (ID: 123)")
+            Button(onClick = { navigationManager.navigateTo(Screen.EditExpense(123)) }) {
+                Text("Edit Expense (ID: 123)")
             }
 
             Button(onClick = { navigationManager.navigateTo(Screen.Friends) }) {
