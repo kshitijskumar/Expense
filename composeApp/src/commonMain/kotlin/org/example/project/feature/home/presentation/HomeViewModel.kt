@@ -7,6 +7,7 @@ import org.example.project.navigation.NavigationManager
 import org.example.project.navigation.Screen
 import org.example.project.ui.base.BaseViewModel
 import org.example.project.util.DateTimeUtil
+import org.example.project.util.getCurrentTimeMillis
 
 class HomeViewModel(
     private val homeOrchestrator: HomeOrchestrator,
@@ -32,7 +33,14 @@ class HomeViewModel(
             HomeIntent.Refresh -> { /* Orchestrator refresh TBD; avoid duplicate initialize */ }
             HomeIntent.NavigateToAddExpense -> navigationManager.navigateTo(Screen.AddExpense)
             is HomeIntent.NavigateToExpenseDetail -> navigationManager.navigateTo(Screen.EditExpense(intent.expenseId))
-            HomeIntent.NavigateToViewAllTransactions -> navigationManager.navigateTo(Screen.MonthlyReport(DateTimeUtil.getCurrentMonth()))
+            is HomeIntent.NavigateToViewAllTransactions -> {
+                val (year, month) = if (intent.transactionList.transactions.isNotEmpty()) {
+                    DateTimeUtil.getYearMonthFromTimestamp(intent.transactionList.transactions[0].date)
+                } else {
+                    DateTimeUtil.getYearMonthFromTimestamp(DateTimeUtil.getCurrentTimeMillis())
+                }
+                navigationManager.navigateTo(Screen.MonthlyReport(year = year, month = month))
+            }
         }
     }
 }

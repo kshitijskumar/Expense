@@ -92,8 +92,8 @@ fun HomeScreen(
                             onExpenseClick = { expenseId ->
                                 viewModel.onIntent(HomeIntent.NavigateToExpenseDetail(expenseId))
                             },
-                            onViewAllClick = {
-                                viewModel.onIntent(HomeIntent.NavigateToViewAllTransactions)
+                            onViewAllClick = { transactionList ->
+                                viewModel.onIntent(HomeIntent.NavigateToViewAllTransactions(transactionList = transactionList))
                             }
                         )
                     }
@@ -117,7 +117,7 @@ private fun componentKey(component: HomeComponent): String {
 private fun HomeComponentRow(
     component: HomeComponent,
     onExpenseClick: (Long) -> Unit,
-    onViewAllClick: () -> Unit
+    onViewAllClick: (HomeComponent.TransactionList) -> Unit
 ) {
     when (component) {
         is HomeComponent.DateHeader -> DateHeaderComponent(component)
@@ -242,7 +242,7 @@ private fun BudgetCardComponent(component: HomeComponent.BudgetCard) {
 private fun TransactionListComponent(
     component: HomeComponent.TransactionList,
     onExpenseClick: (Long) -> Unit,
-    onViewAllClick: () -> Unit
+    onViewAllClick: (HomeComponent.TransactionList) -> Unit
 ) {
     Column {
         Row(
@@ -259,7 +259,7 @@ private fun TransactionListComponent(
                 text = "View all",
                 style = MaterialTheme.typography.titleMedium,
                 color = AppColors.current.primary,
-                modifier = Modifier.clickable { onViewAllClick() }
+                modifier = Modifier.clickable { onViewAllClick(component) }
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
