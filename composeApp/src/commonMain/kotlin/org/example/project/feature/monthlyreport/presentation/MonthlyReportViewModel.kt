@@ -66,7 +66,6 @@ class MonthlyReportViewModel(
             is MonthlyReportIntent.ViewAllCategoriesClicked -> handleViewAllCategoriesClicked()
             is MonthlyReportIntent.ViewAllFriendsClicked -> handleViewAllFriendsClicked()
             is MonthlyReportIntent.TransactionClicked -> handleTransactionClicked(intent.expenseId)
-            MonthlyReportIntent.BackClicked -> handleBackClicked()
         }
     }
 
@@ -127,10 +126,6 @@ class MonthlyReportViewModel(
     }
 
     private fun handleTransactionClicked(expenseId: Long) {
-        // TODO: Implement transaction detail navigation
-    }
-
-    private fun handleBackClicked() {
-        // TODO: Implement back navigation
+        navigationManager.navigateTo(Screen.EditExpense(expenseId))
     }
 }

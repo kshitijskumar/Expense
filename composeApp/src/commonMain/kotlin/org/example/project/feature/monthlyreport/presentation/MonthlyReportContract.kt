@@ -91,8 +91,4 @@ sealed interface MonthlyReportIntent {
      */
     data class TransactionClicked(val expenseId: Long) : MonthlyReportIntent
 
-    /**
-     * User navigated back from the screen.
-     */
-    data object BackClicked : MonthlyReportIntent
 }
