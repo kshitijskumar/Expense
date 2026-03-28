@@ -20,12 +20,9 @@ class MonthlyReportViewModel(
 ) : BaseViewModel<MonthlyReportState, MonthlyReportIntent>(MonthlyReportState()) {
 
     init {
-        // Initialize state with month and year from screen args
-        val initialMonth = args.month
-        val initialYear = args.year
-        updateState {
-            copy(selectedMonth = initialMonth, selectedYear = initialYear)
-        }
+        // Initialize with month and year from screen args using the intent handler
+        // This ensures showMoveToCurrentMonth flag is computed correctly
+        handleMonthChanged(args.month, args.year)
 
         // Subscribe to month changes and fetch analysis data
         // When selectedMonth or selectedYear changes, flatMapLatest cancels the previous subscription
