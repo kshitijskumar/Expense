@@ -62,6 +62,7 @@ class MonthlyReportViewModel(
             is MonthlyReportIntent.MonthChanged -> handleMonthChanged(intent.month, intent.year)
             MonthlyReportIntent.PreviousMonthClicked -> handlePreviousMonthClicked()
             MonthlyReportIntent.NextMonthClicked -> handleNextMonthClicked()
+            MonthlyReportIntent.MoveToCurrentMonthClicked -> handleMoveToCurrentMonthClicked()
             is MonthlyReportIntent.ViewAllCategoriesClicked -> handleViewAllCategoriesClicked()
             is MonthlyReportIntent.ViewAllFriendsClicked -> handleViewAllFriendsClicked()
             is MonthlyReportIntent.TransactionClicked -> handleTransactionClicked(intent.expenseId)
@@ -70,10 +71,20 @@ class MonthlyReportViewModel(
     }
 
     private fun handleMonthChanged(month: Int, year: Int) {
+        // Get current month/year to determine if selected month is different
+        val (currentMonth, currentYear) = DateTimeUtil.getYearMonthFromTimestamp(DateTimeUtil.getCurrentTimeMillis())
+        val isCurrentMonth = (month == currentMonth && year == currentYear)
+
         // Update selected month/year, which triggers flatMapLatest to fetch new data
+        // Also compute showMoveToCurrentMonth flag based on whether selected month is current month
         // Note: no guard on future time because currently for adding flow also we dont have time check for future timings
         updateState {
-            copy(selectedMonth = month, selectedYear = year, isLoading = true)
+            copy(
+                selectedMonth = month,
+                selectedYear = year,
+                isLoading = true,
+                showMoveToCurrentMonth = !isCurrentMonth
+            )
         }
     }
 
@@ -99,6 +110,12 @@ class MonthlyReportViewModel(
             )
             handleMonthChanged(nextMonth, nextYear)
         }
+    }
+
+    private fun handleMoveToCurrentMonthClicked() {
+        // Jump back to the current month
+        val (currentMonth, currentYear) = DateTimeUtil.getYearMonthFromTimestamp(DateTimeUtil.getCurrentTimeMillis())
+        handleMonthChanged(currentMonth, currentYear)
     }
 
     private fun handleViewAllCategoriesClicked() {

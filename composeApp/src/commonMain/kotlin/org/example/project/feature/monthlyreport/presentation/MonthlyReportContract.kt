@@ -21,6 +21,9 @@ import org.example.project.domain.model.ExpenseDetailModel
  * @param transactions All expenses for the month (sorted desc by date).
  *                     UI will group these by date for display.
  *                     Empty list if no data loaded yet.
+ * @param showMoveToCurrentMonth True when the selected month/year is NOT the current month/year.
+ *                               UI can show a button/chip allowing user to jump back to current month.
+ *                               Automatically updated whenever month is selected.
  */
 data class MonthlyReportState(
     val selectedMonth: Int? = null,
@@ -29,7 +32,8 @@ data class MonthlyReportState(
     val totalSpent: Long? = null,
     val allCategorySpendings: List<CategorySpend> = emptyList(),
     val allFriendSpendings: List<FriendSpend> = emptyList(),
-    val transactions: List<ExpenseDetailModel> = emptyList()
+    val transactions: List<ExpenseDetailModel> = emptyList(),
+    val showMoveToCurrentMonth: Boolean = false
 ) {
     /**
      * Top 3 categories by spending. Computed from allCategorySpendings.
@@ -63,6 +67,12 @@ sealed interface MonthlyReportIntent {
      * Navigate to next month.
      */
     data object NextMonthClicked : MonthlyReportIntent
+
+    /**
+     * Jump back to the current month (when user is viewing a past/future month).
+     * Triggers when user clicks "Go to current month" button/chip.
+     */
+    data object MoveToCurrentMonthClicked : MonthlyReportIntent
 
     /**
      * User clicked "View all categories" button.
