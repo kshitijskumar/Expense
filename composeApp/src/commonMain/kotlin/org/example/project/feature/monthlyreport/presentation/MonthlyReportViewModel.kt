@@ -70,15 +70,35 @@ class MonthlyReportViewModel(
     }
 
     private fun handleMonthChanged(month: Int, year: Int) {
-        // TODO: Implement month change
+        // Update selected month/year, which triggers flatMapLatest to fetch new data
+        // Note: no guard on future time because currently for adding flow also we dont have time check for future timings
+        updateState {
+            copy(selectedMonth = month, selectedYear = year, isLoading = true)
+        }
     }
 
     private fun handlePreviousMonthClicked() {
-        // TODO: Implement previous month navigation
+        // Get current month and year, calculate previous month
+        val currentState = state.value
+        if (currentState.selectedMonth != null && currentState.selectedYear != null) {
+            val (prevMonth, prevYear) = DateTimeUtil.getPreviousMonth(
+                currentState.selectedMonth,
+                currentState.selectedYear
+            )
+            handleMonthChanged(prevMonth, prevYear)
+        }
     }
 
     private fun handleNextMonthClicked() {
-        // TODO: Implement next month navigation
+        // Get current month and year, calculate next month
+        val currentState = state.value
+        if (currentState.selectedMonth != null && currentState.selectedYear != null) {
+            val (nextMonth, nextYear) = DateTimeUtil.getNextMonth(
+                currentState.selectedMonth,
+                currentState.selectedYear
+            )
+            handleMonthChanged(nextMonth, nextYear)
+        }
     }
 
     private fun handleViewAllCategoriesClicked() {

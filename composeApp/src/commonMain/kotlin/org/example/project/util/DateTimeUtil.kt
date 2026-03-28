@@ -84,4 +84,20 @@ object DateTimeUtil {
 
         return Pair(startTimestamp, endTimestamp)
     }
+
+    fun getPreviousMonth(month: Int, year: Int): Pair<Int, Int> {
+        return if (month == 1) {
+            Pair(12, year - 1)
+        } else {
+            Pair(month - 1, year)
+        }
+    }
+
+    fun getNextMonth(month: Int, year: Int): Pair<Int, Int> {
+        return if (month == 12) {
+            Pair(1, year + 1)
+        } else {
+            Pair(month + 1, year)
+        }
+    }
 }
