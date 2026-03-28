@@ -8,20 +8,23 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import org.example.project.feature.monthlyreport.domain.MonthlyReportOrchestrator
 import org.example.project.navigation.NavigationManager
+import org.example.project.navigation.Screen
 import org.example.project.ui.base.BaseViewModel
 import org.example.project.util.DateTimeUtil
 import org.example.project.util.getCurrentTimeMillis
 
 class MonthlyReportViewModel(
+    args: Screen.MonthlyReport,
     private val monthlyReportOrchestrator: MonthlyReportOrchestrator,
     private val navigationManager: NavigationManager
 ) : BaseViewModel<MonthlyReportState, MonthlyReportIntent>(MonthlyReportState()) {
 
     init {
-        // Initialize with current month/year
-        val (year, month) = DateTimeUtil.getYearMonthFromTimestamp(getCurrentTimeMillis())
+        // Initialize state with month and year from screen args
+        val initialMonth = args.month
+        val initialYear = args.year
         updateState {
-            copy(selectedMonth = month, selectedYear = year)
+            copy(selectedMonth = initialMonth, selectedYear = initialYear)
         }
 
         // Subscribe to month changes and fetch analysis data
@@ -31,7 +34,14 @@ class MonthlyReportViewModel(
             .map { it.selectedMonth to it.selectedYear }
             .distinctUntilChanged()
             .flatMapLatest { (month, year) ->
-                monthlyReportOrchestrator.getMonthAnalysis(month, year)
+                // Only fetch data if both month and year are non-null
+                if (month != null && year != null) {
+                    monthlyReportOrchestrator.getMonthAnalysis(month, year)
+                } else {
+                    // This shouldn't happen in normal flow since we set month/year in init,
+                    // but guard against it anyway
+                    kotlinx.coroutines.flow.emptyFlow()
+                }
             }
             .onEach { analysis ->
                 updateState {

@@ -7,22 +7,26 @@ import org.example.project.domain.model.ExpenseDetailModel
 /**
  * UI state for MonthlyReport screen.
  *
- * @param selectedMonth 1-12 for the currently selected month
- * @param selectedYear The currently selected year
+ * @param selectedMonth 1-12 for the currently selected month. Null during initialization
+ *                      until constructor args are processed.
+ * @param selectedYear The currently selected year. Null during initialization until constructor args are processed.
  * @param isLoading True while orchestrator is computing analysis data
- * @param totalSpent Total amount spent in the selected month
+ * @param totalSpent Total amount spent in the selected month. Null until data loads.
  * @param allCategorySpendings All categories for the month (sorted desc by amount).
  *                             UI shows top 3, with option to view all.
+ *                             Empty list if no data loaded yet.
  * @param allFriendSpendings All friends for the month (sorted desc by amount owed).
  *                           UI shows top 3, with option to view all.
+ *                           Empty list if no data loaded yet.
  * @param transactions All expenses for the month (sorted desc by date).
  *                     UI will group these by date for display.
+ *                     Empty list if no data loaded yet.
  */
 data class MonthlyReportState(
-    val selectedMonth: Int = 1,
-    val selectedYear: Int = 2024,
+    val selectedMonth: Int? = null,
+    val selectedYear: Int? = null,
     val isLoading: Boolean = true,
-    val totalSpent: Long = 0L,
+    val totalSpent: Long? = null,
     val allCategorySpendings: List<CategorySpend> = emptyList(),
     val allFriendSpendings: List<FriendSpend> = emptyList(),
     val transactions: List<ExpenseDetailModel> = emptyList()
