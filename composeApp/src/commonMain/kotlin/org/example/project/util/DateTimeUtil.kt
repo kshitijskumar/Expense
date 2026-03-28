@@ -73,4 +73,15 @@ object DateTimeUtil {
         val endOfDay = LocalDateTime(localDate, LocalTime(23, 59, 59, 999_000_000))
         return endOfDay.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
     }
+
+    fun getMonthRange(month: Int, year: Int): Pair<Long, Long> {
+        val startDate = LocalDate(year, month, 1)
+        val startTimestamp = startDate.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+
+        val endDate = startDate.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)
+        val endDateTime = LocalDateTime(endDate, LocalTime(23, 59, 59, 999_000_000))
+        val endTimestamp = endDateTime.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+
+        return Pair(startTimestamp, endTimestamp)
+    }
 }
