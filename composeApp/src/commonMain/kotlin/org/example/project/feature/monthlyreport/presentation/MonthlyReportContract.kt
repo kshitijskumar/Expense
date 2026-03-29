@@ -3,6 +3,20 @@ package org.example.project.feature.monthlyreport.presentation
 import org.example.project.feature.monthlyreport.domain.model.CategorySpend
 import org.example.project.feature.monthlyreport.domain.model.FriendSpend
 import org.example.project.domain.model.ExpenseDetailModel
+import kotlinx.datetime.LocalDate
+
+/**
+ * Grouped transactions by date with smart date label.
+ *
+ * @param dateLabel Smart formatted date label: "TODAY", "YESTERDAY", or "d MMMM" format
+ * @param date The actual date for sorting/tracking
+ * @param transactions List of transactions on this date, sorted by time (newest first)
+ */
+data class TransactionGroup(
+    val dateLabel: String,
+    val date: LocalDate,
+    val transactions: List<ExpenseDetailModel>
+)
 
 /**
  * UI state for MonthlyReport screen.
@@ -33,6 +47,7 @@ data class MonthlyReportState(
     val allCategorySpendings: List<CategorySpend> = emptyList(),
     val allFriendSpendings: List<FriendSpend> = emptyList(),
     val transactions: List<ExpenseDetailModel> = emptyList(),
+    val transactionsByDate: List<TransactionGroup> = emptyList(),
     val showMoveToCurrentMonth: Boolean = false
 ) {
     /**
@@ -52,6 +67,11 @@ data class MonthlyReportState(
  * User intents for the MonthlyReport screen.
  */
 sealed interface MonthlyReportIntent {
+    /**
+     * User clicked the back button to navigate away from this screen.
+     */
+    data object BackClicked : MonthlyReportIntent
+
     /**
      * User manually selected a new month/year from picker or navigation.
      * Triggers orchestrator subscription for the new month.

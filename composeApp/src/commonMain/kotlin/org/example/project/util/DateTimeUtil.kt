@@ -100,4 +100,39 @@ object DateTimeUtil {
             Pair(month + 1, year)
         }
     }
+
+    fun getLocalDateFromTimestamp(timestamp: Long): LocalDate {
+        val instant = Instant.fromEpochMilliseconds(timestamp)
+        return instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
+    }
+
+    fun getCurrentLocalDate(): LocalDate {
+        return getLocalDateFromTimestamp(getCurrentTimeMillis())
+    }
+
+    fun getRelativeDateLabel(date: LocalDate): String {
+        val today = getCurrentLocalDate()
+        val yesterday = today.minus(1, DateTimeUnit.DAY)
+
+        return when (date) {
+            today -> "Today"
+            yesterday -> "Yesterday"
+            else -> {
+                val format = LocalDate.Format {
+                    dayOfMonth()
+                    char(' ')
+                    monthName(MonthNames.ENGLISH_FULL)
+                }
+                format.format(date)
+            }
+        }
+    }
+
+    fun getMonthYearLabel(month: Int, year: Int): String {
+        val localDate = LocalDate(year, month, 1)
+        val format = LocalDate.Format {
+            monthName(MonthNames.ENGLISH_FULL)
+        }
+        return "${format.format(localDate)} $year"
+    }
 }
