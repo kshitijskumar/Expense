@@ -26,4 +26,6 @@ interface ExpenseRepository {
     fun getExpensesByDateFlow(startOfDay: Long, endOfDay: Long): Flow<List<ExpenseSummaryModel>>
 
     fun getTotalSpentForMonthFlow(monthStart: Long, monthEnd: Long): Flow<Long>
+
+    fun getExpensesWithParticipantsForMonthFlow(monthStart: Long, monthEnd: Long): Flow<List<ExpenseDetailModel>>
 }

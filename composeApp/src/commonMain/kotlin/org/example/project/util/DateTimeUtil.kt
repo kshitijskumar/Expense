@@ -10,6 +10,7 @@ import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
 import kotlinx.datetime.minus
+import kotlinx.datetime.number
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
@@ -36,6 +37,12 @@ object DateTimeUtil {
         val now = Instant.fromEpochMilliseconds(getCurrentTimeMillis())
         val localDate = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
         return "${localDate.year}-${localDate.monthNumber.toString().padStart(2, '0')}"
+    }
+
+    fun getYearMonthFromTimestamp(timestamp: Long): Pair<Int, Int> {
+        val instant = Instant.fromEpochMilliseconds(timestamp)
+        val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
+        return Pair(localDate.year, localDate.month.number)
     }
 
     fun getMonthStartTimestamp(month: String): Long {
@@ -65,5 +72,67 @@ object DateTimeUtil {
         val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
         val endOfDay = LocalDateTime(localDate, LocalTime(23, 59, 59, 999_000_000))
         return endOfDay.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+    }
+
+    fun getMonthRange(month: Int, year: Int): Pair<Long, Long> {
+        val startDate = LocalDate(year, month, 1)
+        val startTimestamp = startDate.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+
+        val endDate = startDate.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY)
+        val endDateTime = LocalDateTime(endDate, LocalTime(23, 59, 59, 999_000_000))
+        val endTimestamp = endDateTime.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+
+        return Pair(startTimestamp, endTimestamp)
+    }
+
+    fun getPreviousMonth(month: Int, year: Int): Pair<Int, Int> {
+        return if (month == 1) {
+            Pair(12, year - 1)
+        } else {
+            Pair(month - 1, year)
+        }
+    }
+
+    fun getNextMonth(month: Int, year: Int): Pair<Int, Int> {
+        return if (month == 12) {
+            Pair(1, year + 1)
+        } else {
+            Pair(month + 1, year)
+        }
+    }
+
+    fun getLocalDateFromTimestamp(timestamp: Long): LocalDate {
+        val instant = Instant.fromEpochMilliseconds(timestamp)
+        return instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
+    }
+
+    fun getCurrentLocalDate(): LocalDate {
+        return getLocalDateFromTimestamp(getCurrentTimeMillis())
+    }
+
+    fun getRelativeDateLabel(date: LocalDate): String {
+        val today = getCurrentLocalDate()
+        val yesterday = today.minus(1, DateTimeUnit.DAY)
+
+        return when (date) {
+            today -> "Today"
+            yesterday -> "Yesterday"
+            else -> {
+                val format = LocalDate.Format {
+                    dayOfMonth()
+                    char(' ')
+                    monthName(MonthNames.ENGLISH_FULL)
+                }
+                format.format(date)
+            }
+        }
+    }
+
+    fun getMonthYearLabel(month: Int, year: Int): String {
+        val localDate = LocalDate(year, month, 1)
+        val format = LocalDate.Format {
+            monthName(MonthNames.ENGLISH_FULL)
+        }
+        return "${format.format(localDate)} $year"
     }
 }

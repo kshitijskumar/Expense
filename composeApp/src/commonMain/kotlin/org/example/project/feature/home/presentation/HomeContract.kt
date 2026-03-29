@@ -6,6 +6,7 @@ sealed interface HomeIntent {
     data object Refresh : HomeIntent
     data object NavigateToAddExpense : HomeIntent
     data class NavigateToExpenseDetail(val expenseId: Long) : HomeIntent
+    data class NavigateToViewAllTransactions(val transactionList: HomeComponent.TransactionList) : HomeIntent
 }
 
 data class HomeState(

@@ -22,8 +22,10 @@ import org.example.project.feature.addexpense.presentation.ui.AddExpenseScreen
 import org.example.project.feature.addexpense.presentation.ui.EditExpenseScreen
 import org.example.project.feature.home.presentation.HomeViewModel
 import org.example.project.feature.home.presentation.ui.HomeScreen
+import org.example.project.feature.monthlyreport.presentation.ui.MonthlyReportScreen
 import org.example.project.feature.category.CategorySelector
 import org.example.project.feature.friend.FriendSelector
+import org.example.project.feature.monthlyreport.presentation.MonthlyReportViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
@@ -104,11 +106,8 @@ fun Navigator(
 
         composable<Screen.MonthlyReport> { backStackEntry ->
             val route = backStackEntry.toRoute<Screen.MonthlyReport>()
-            ScreenPlaceholder(
-                title = "Monthly Report",
-                subtitle = "Month: ${route.month}",
-                navigationManager = navigationManager
-            )
+            val viewmodel = koinInject<MonthlyReportViewModel> { parametersOf(route) }
+            MonthlyReportScreen(viewmodel)
         }
 
         composable<Screen.FriendBalance> { backStackEntry ->
@@ -172,7 +171,7 @@ private fun ScreenPlaceholder(
                 Text("Categories")
             }
 
-            Button(onClick = { navigationManager.navigateTo(Screen.MonthlyReport("2026-03")) }) {
+            Button(onClick = { navigationManager.navigateTo(Screen.MonthlyReport(year = 2026, month = 3)) }) {
                 Text("Monthly Report (March 2026)")
             }
 

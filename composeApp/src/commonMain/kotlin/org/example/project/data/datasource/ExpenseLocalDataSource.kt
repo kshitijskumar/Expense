@@ -170,4 +170,42 @@ class ExpenseLocalDataSource(private val db: DatabaseHelper) {
             .mapToOneOrNull(Dispatchers.IO)
             .map { row -> row?.total ?: 0L }
     }
+
+    fun getExpensesWithParticipantsForMonthFlow(
+        monthStart: Long,
+        monthEnd: Long
+    ): Flow<List<ExpenseDetailModel>> {
+        return db.expenseQueries.getExpensesWithParticipantsByMonth(monthStart, monthEnd)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { rows ->
+                // Collapse rows by expense id: each expense-friend pair is a separate row
+                rows.groupBy { it.id }
+                    .map { (_, expenseRows) ->
+                        val first = expenseRows.first()
+                        ExpenseDetailModel(
+                            id = first.id,
+                            title = first.title,
+                            amount = first.amount,
+                            date = first.date,
+                            category = CategoryModel(
+                                id = first.category_id,
+                                name = first.category_name
+                            ),
+                            participants = expenseRows.mapNotNull { row ->
+                                if (row.friend_id != null && row.friend_name != null) {
+                                    FriendModel(
+                                        id = row.friend_id,
+                                        name = row.friend_name
+                                    )
+                                } else {
+                                    null
+                                }
+                            },
+                            notes = first.notes
+                        )
+                    }
+                    .sortedByDescending { it.date }
+            }
+    }
 }

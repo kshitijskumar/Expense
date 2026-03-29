@@ -50,4 +50,11 @@ class ExpenseRepositoryImpl(
     override fun getTotalSpentForMonthFlow(monthStart: Long, monthEnd: Long): Flow<Long> {
         return dataSource.getTotalSpentForMonthFlow(monthStart, monthEnd)
     }
+
+    override fun getExpensesWithParticipantsForMonthFlow(
+        monthStart: Long,
+        monthEnd: Long
+    ): Flow<List<ExpenseDetailModel>> {
+        return dataSource.getExpensesWithParticipantsForMonthFlow(monthStart, monthEnd)
+    }
 }

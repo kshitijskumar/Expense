@@ -15,16 +15,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -35,14 +32,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import org.example.project.domain.model.ExpenseSummaryModel
 import org.example.project.feature.home.domain.model.HomeComponent
 import org.example.project.feature.home.presentation.HomeIntent
 import org.example.project.feature.home.presentation.HomeViewModel
 import org.example.project.navigation.NavigationManager
 import org.example.project.navigation.Screen
+import org.example.project.ui.components.TransactionRow
 import org.example.project.ui.theme.AppColors
 import org.example.project.util.CurrencyUtil
 import org.koin.compose.koinInject
@@ -91,6 +87,9 @@ fun HomeScreen(
                             component = component,
                             onExpenseClick = { expenseId ->
                                 viewModel.onIntent(HomeIntent.NavigateToExpenseDetail(expenseId))
+                            },
+                            onViewAllClick = { transactionList ->
+                                viewModel.onIntent(HomeIntent.NavigateToViewAllTransactions(transactionList = transactionList))
                             }
                         )
                     }
@@ -111,11 +110,15 @@ private fun componentKey(component: HomeComponent): String {
 }
 
 @Composable
-private fun HomeComponentRow(component: HomeComponent, onExpenseClick: (Long) -> Unit) {
+private fun HomeComponentRow(
+    component: HomeComponent,
+    onExpenseClick: (Long) -> Unit,
+    onViewAllClick: (HomeComponent.TransactionList) -> Unit
+) {
     when (component) {
         is HomeComponent.DateHeader -> DateHeaderComponent(component)
         is HomeComponent.BudgetCard -> BudgetCardComponent(component)
-        is HomeComponent.TransactionList -> TransactionListComponent(component, onExpenseClick)
+        is HomeComponent.TransactionList -> TransactionListComponent(component, onExpenseClick, onViewAllClick)
         HomeComponent.EmptyTransactions -> EmptyTransactionsComponent()
         is HomeComponent.ErrorCard -> ErrorCardComponent(component)
     }
@@ -234,91 +237,41 @@ private fun BudgetCardComponent(component: HomeComponent.BudgetCard) {
 @Composable
 private fun TransactionListComponent(
     component: HomeComponent.TransactionList,
-    onExpenseClick: (Long) -> Unit
+    onExpenseClick: (Long) -> Unit,
+    onViewAllClick: (HomeComponent.TransactionList) -> Unit
 ) {
     Column {
-        Text(
-            text = component.date,
-            style = MaterialTheme.typography.titleLarge,
-            color = AppColors.current.textSecondary
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = component.date,
+                style = MaterialTheme.typography.titleLarge,
+                color = AppColors.current.textSecondary
+            )
+            Text(
+                text = "View all",
+                style = MaterialTheme.typography.titleMedium,
+                color = AppColors.current.primary,
+                modifier = Modifier.clickable { onViewAllClick(component) }
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
         component.transactions.forEach { tx ->
-            TransactionRow(tx = tx, onClick = { onExpenseClick(tx.id) })
+            TransactionRow(
+                title = tx.title,
+                amount = tx.amount,
+                category = tx.category,
+                participantCount = tx.participantCount,
+                onClick = { onExpenseClick(tx.id) }
+            )
             Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }
 
-@Composable
-private fun TransactionRow(tx: ExpenseSummaryModel, onClick: () -> Unit) {
-    val colors = AppColors.current
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = colors.surface)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 12.dp)
-        ) {
-            // Row 1: title and amount
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = tx.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = colors.textPrimary,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = CurrencyUtil.toDisplayAmount(tx.amount),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = colors.textPrimary
-                )
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            // Row 2: category chip and participant info
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Category chip with yellow background and black text
-                Surface(
-                    shape = RoundedCornerShape(6.dp),
-                    color = colors.primary
-                ) {
-                    Text(
-                        text = tx.category.name,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = colors.onPrimary,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                    )
-                }
-
-                // Participant count
-                if (tx.participantCount > 0) {
-                    Text(
-                        text = "with ${tx.participantCount} others",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = colors.textSecondary
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
 private fun EmptyTransactionsComponent() {

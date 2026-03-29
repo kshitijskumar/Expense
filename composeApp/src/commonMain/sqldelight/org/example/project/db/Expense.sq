@@ -90,10 +90,30 @@ SELECT MAX(date) FROM Expense;
 
 -- Get all expenses for a specific date range (for a single day)
 getExpensesByDate:
-SELECT 
+SELECT
     Expense.*,
     Category.name AS category_name
 FROM Expense
 INNER JOIN Category ON Expense.category_id = Category.id
 WHERE Expense.date >= ? AND Expense.date < ?
+ORDER BY Expense.date DESC;
+
+-- Get expenses with all participants for a month
+-- Returns one row per expense-friend pair; expenses with no participants get one row with friend_id = null
+getExpensesWithParticipantsByMonth:
+SELECT
+    Expense.id,
+    Expense.title,
+    Expense.amount,
+    Expense.date,
+    Expense.category_id,
+    Expense.notes,
+    Category.name AS category_name,
+    Friend.id AS friend_id,
+    Friend.name AS friend_name
+FROM Expense
+INNER JOIN Category ON Expense.category_id = Category.id
+LEFT JOIN ExpenseParticipant ON Expense.id = ExpenseParticipant.expense_id
+LEFT JOIN Friend ON ExpenseParticipant.friend_id = Friend.id
+WHERE Expense.date >= ? AND Expense.date <= ?
 ORDER BY Expense.date DESC;

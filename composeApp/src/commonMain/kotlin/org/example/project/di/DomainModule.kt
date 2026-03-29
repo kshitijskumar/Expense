@@ -8,6 +8,9 @@ import org.example.project.feature.addexpense.domain.GetExpenseUseCase
 import org.example.project.feature.addexpense.domain.UpdateExpenseUseCase
 import org.example.project.feature.home.domain.orchestrator.HomeOrchestrator
 import org.example.project.feature.home.domain.orchestrator.HomeOrchestratorImpl
+import org.example.project.feature.monthlyreport.domain.ComputeFriendSpendsUseCase
+import org.example.project.feature.monthlyreport.domain.MonthlyReportOrchestrator
+import org.example.project.feature.monthlyreport.domain.MonthlyReportOrchestratorImpl
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
@@ -40,5 +43,9 @@ val domainModule = module {
     }
 
     factory<HomeOrchestrator> { HomeOrchestratorImpl(get(), get()) }
+
+    factoryOf(::ComputeFriendSpendsUseCase)
+    factory<MonthlyReportOrchestrator> { MonthlyReportOrchestratorImpl(get(), get()) }
+
     factoryOf(::ExpenseInputValidationImpl) { bind<ExpenseInputValidation>() }
 }
