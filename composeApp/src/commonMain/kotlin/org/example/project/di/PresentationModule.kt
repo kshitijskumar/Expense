@@ -8,6 +8,7 @@ import org.example.project.feature.category.CategorySelector
 import org.example.project.feature.friend.FriendSelector
 import org.example.project.navigation.Screen
 import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -15,7 +16,7 @@ val presentationModule = module {
     viewModelOf(::AddExpenseViewModel)
     viewModelOf(::HomeViewModel)
 
-    factory { (args: Screen.EditExpense) ->
+    viewModel { (args: Screen.EditExpense) ->
         EditExpenseViewModel(
             args = args,
             getExpenseUseCase = get(),
@@ -27,7 +28,7 @@ val presentationModule = module {
         )
     }
 
-    factory { (args: Screen.MonthlyReport) ->
+    viewModel { (args: Screen.MonthlyReport) ->
         MonthlyReportViewModel(
             args = args,
             monthlyReportOrchestrator = get(),
