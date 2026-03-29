@@ -100,24 +100,38 @@ fun MonthlyReportScreen(
                     )
                 }
 
-                state.transactionsByDate.forEach { group ->
-                    stickyHeader(key = group.dateLabel) {
-                        DateHeaderComponent(group.dateLabel)
-                    }
-
-                    items(
-                        items = group.transactions,
-                        key = { it.id }
-                    ) { expense ->
-                        TransactionRow(
-                            title = expense.title,
-                            amount = expense.amount,
-                            category = expense.category,
-                            participantCount = expense.participants.size,
-                            onClick = {
-                                viewModel.onIntent(MonthlyReportIntent.TransactionClicked(expense.id))
-                            }
+                if (state.transactionsByDate.isEmpty()) {
+                    item {
+                        Text(
+                            text = "No transactions recorded",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AppColors.current.textSecondary,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 32.dp),
+                            textAlign = TextAlign.Center
                         )
+                    }
+                } else {
+                    state.transactionsByDate.forEach { group ->
+                        stickyHeader(key = group.dateLabel) {
+                            DateHeaderComponent(group.dateLabel)
+                        }
+
+                        items(
+                            items = group.transactions,
+                            key = { it.id }
+                        ) { expense ->
+                            TransactionRow(
+                                title = expense.title,
+                                amount = expense.amount,
+                                category = expense.category,
+                                participantCount = expense.participants.size,
+                                onClick = {
+                                    viewModel.onIntent(MonthlyReportIntent.TransactionClicked(expense.id))
+                                }
+                            )
+                        }
                     }
                 }
             }
