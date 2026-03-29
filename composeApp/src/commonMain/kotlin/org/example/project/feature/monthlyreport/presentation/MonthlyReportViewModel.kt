@@ -71,7 +71,7 @@ class MonthlyReportViewModel(
 
     private fun handleMonthChanged(month: Int, year: Int) {
         // Get current month/year to determine if selected month is different
-        val (currentMonth, currentYear) = DateTimeUtil.getYearMonthFromTimestamp(DateTimeUtil.getCurrentTimeMillis())
+        val (currentYear, currentMonth) = DateTimeUtil.getYearMonthFromTimestamp(DateTimeUtil.getCurrentTimeMillis())
         val isCurrentMonth = (month == currentMonth && year == currentYear)
 
         // Update selected month/year, which triggers flatMapLatest to fetch new data
@@ -113,7 +113,7 @@ class MonthlyReportViewModel(
 
     private fun handleMoveToCurrentMonthClicked() {
         // Jump back to the current month
-        val (currentMonth, currentYear) = DateTimeUtil.getYearMonthFromTimestamp(DateTimeUtil.getCurrentTimeMillis())
+        val (currentYear, currentMonth) = DateTimeUtil.getYearMonthFromTimestamp(DateTimeUtil.getCurrentTimeMillis())
         handleMonthChanged(currentMonth, currentYear)
     }
 

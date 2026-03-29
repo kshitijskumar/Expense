@@ -186,8 +186,7 @@ private fun MonthlyReportTopBar(
 
             Button(
                 onClick = onMoveToCurrentMonth,
-                enabled = state.showMoveToCurrentMonth,
-                modifier = Modifier.height(32.dp)
+                enabled = state.showMoveToCurrentMonth
             ) {
                 Text("Today", fontSize = 12.sp)
             }
@@ -265,6 +264,7 @@ private fun CategoriesCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight()
                 .padding(12.dp)
         ) {
             Text(
@@ -294,6 +294,8 @@ private fun CategoriesCard(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
+            Spacer(modifier = Modifier.weight(1f))
+
             Text(
                 text = "+ view all",
                 style = MaterialTheme.typography.labelSmall,
@@ -317,6 +319,7 @@ private fun FriendsCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight()
                 .padding(12.dp)
         ) {
             Text(
@@ -345,6 +348,8 @@ private fun FriendsCard(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }
+
+            Spacer(modifier = Modifier.weight(1f))
 
             Text(
                 text = "+ view all",
