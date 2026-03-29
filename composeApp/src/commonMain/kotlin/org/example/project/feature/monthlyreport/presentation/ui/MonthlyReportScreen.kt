@@ -268,30 +268,39 @@ private fun CategoriesCard(
                 .padding(12.dp)
         ) {
             Text(
-                text = "CATEGORIES",
+                text = "Categories",
                 style = MaterialTheme.typography.labelMedium,
                 color = AppColors.current.textPrimary
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            categories.forEach { category ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = category.category.name,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.current.textPrimary,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text(
-                        text = CurrencyUtil.toDisplayAmount(category.totalAmount),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.current.textSecondary
-                    )
+            if (categories.isEmpty()) {
+                Text(
+                    text = "No categories",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AppColors.current.textSecondary,
+                    modifier = Modifier
+                )
+            } else {
+                categories.forEach { category ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = category.category.name,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AppColors.current.textPrimary,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = CurrencyUtil.toDisplayAmount(category.totalAmount),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AppColors.current.textSecondary
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
-                Spacer(modifier = Modifier.height(8.dp))
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -323,30 +332,39 @@ private fun FriendsCard(
                 .padding(12.dp)
         ) {
             Text(
-                text = "FRIENDS",
+                text = "Friends",
                 style = MaterialTheme.typography.labelMedium,
                 color = AppColors.current.textPrimary
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            friends.forEach { friend ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = friend.friend.name,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.current.textPrimary,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text(
-                        text = CurrencyUtil.toDisplayAmount(friend.amountOwed),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = AppColors.current.textSecondary
-                    )
+            if (friends.isEmpty()) {
+                Text(
+                    text = "No split",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AppColors.current.textSecondary,
+                    modifier = Modifier
+                )
+            } else {
+                friends.forEach { friend ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = friend.friend.name,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AppColors.current.textPrimary,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = CurrencyUtil.toDisplayAmount(friend.amountOwed),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AppColors.current.textSecondary
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
-                Spacer(modifier = Modifier.height(8.dp))
             }
 
             Spacer(modifier = Modifier.weight(1f))
