@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import expense.composeapp.generated.resources.Res
@@ -283,7 +285,7 @@ private fun CategoriesCard(
         ) {
             Text(
                 text = "Categories",
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelLarge,
                 color = AppColors.current.textPrimary
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -291,9 +293,10 @@ private fun CategoriesCard(
             if (categories.isEmpty()) {
                 Text(
                     text = "No categories",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = AppColors.current.textSecondary,
                     modifier = Modifier
+                        .padding(bottom = 8.dp)
                 )
             } else {
                 categories.forEach { category ->
@@ -303,13 +306,16 @@ private fun CategoriesCard(
                     ) {
                         Text(
                             text = category.category.name,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyMedium,
                             color = AppColors.current.textPrimary,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
+                        Spacer(Modifier.width(2.dp))
                         Text(
                             text = CurrencyUtil.toDisplayAmount(category.totalAmount),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyMedium,
                             color = AppColors.current.textSecondary
                         )
                     }
@@ -321,7 +327,7 @@ private fun CategoriesCard(
 
             Text(
                 text = "+ view all",
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = AppColors.current.primary
             )
         }
@@ -347,7 +353,7 @@ private fun FriendsCard(
         ) {
             Text(
                 text = "Friends",
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelLarge,
                 color = AppColors.current.textPrimary
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -355,9 +361,10 @@ private fun FriendsCard(
             if (friends.isEmpty()) {
                 Text(
                     text = "No split",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = AppColors.current.textSecondary,
                     modifier = Modifier
+                        .padding(bottom = 8.dp)
                 )
             } else {
                 friends.forEach { friend ->
@@ -367,13 +374,16 @@ private fun FriendsCard(
                     ) {
                         Text(
                             text = friend.friend.name,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyMedium,
                             color = AppColors.current.textPrimary,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
+                        Spacer(Modifier.width(2.dp))
                         Text(
                             text = CurrencyUtil.toDisplayAmount(friend.amountOwed),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyMedium,
                             color = AppColors.current.textSecondary
                         )
                     }
@@ -385,7 +395,7 @@ private fun FriendsCard(
 
             Text(
                 text = "+ view all",
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = AppColors.current.primary
             )
         }
