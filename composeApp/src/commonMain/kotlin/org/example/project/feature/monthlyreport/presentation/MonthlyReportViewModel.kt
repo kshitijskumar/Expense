@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import org.example.project.feature.monthlyreport.domain.MonthlyReportOrchestrator
+import org.example.project.domain.model.ExpenseDetailModel
 import org.example.project.navigation.NavigationManager
 import org.example.project.navigation.Screen
 import org.example.project.ui.base.BaseViewModel
@@ -47,7 +48,8 @@ class MonthlyReportViewModel(
                         totalSpent = analysis.totalSpent,
                         allCategorySpendings = analysis.categorySpendings,
                         allFriendSpendings = analysis.friendSpendings,
-                        transactions = analysis.transactions
+                        transactions = analysis.transactions,
+                        transactionsByDate = groupTransactionsByDate(analysis.transactions)
                     )
                 }
             }
@@ -56,6 +58,7 @@ class MonthlyReportViewModel(
 
     override fun onIntent(intent: MonthlyReportIntent) {
         when (intent) {
+            MonthlyReportIntent.BackClicked -> navigationManager.navigateBack()
             is MonthlyReportIntent.MonthChanged -> handleMonthChanged(intent.month, intent.year)
             MonthlyReportIntent.PreviousMonthClicked -> handlePreviousMonthClicked()
             MonthlyReportIntent.NextMonthClicked -> handleNextMonthClicked()
@@ -124,5 +127,18 @@ class MonthlyReportViewModel(
 
     private fun handleTransactionClicked(expenseId: Long) {
         navigationManager.navigateTo(Screen.EditExpense(expenseId))
+    }
+
+    private fun groupTransactionsByDate(transactions: List<ExpenseDetailModel>): List<TransactionGroup> {
+        return transactions
+            .groupBy { DateTimeUtil.getLocalDateFromTimestamp(it.date) }
+            .map { (date, txns) ->
+                TransactionGroup(
+                    dateLabel = DateTimeUtil.getRelativeDateLabel(date),
+                    date = date,
+                    transactions = txns.sortedByDescending { it.date }
+                )
+            }
+            .sortedByDescending { it.date }
     }
 }
