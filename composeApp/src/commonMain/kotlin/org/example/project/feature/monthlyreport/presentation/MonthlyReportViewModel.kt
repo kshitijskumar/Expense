@@ -118,7 +118,15 @@ class MonthlyReportViewModel(
     }
 
     private fun handleViewAllCategoriesClicked() {
-        // TODO: Implement navigation to view all categories
+        val currentState = state.value
+        if (currentState.selectedMonth != null && currentState.selectedYear != null) {
+            navigationManager.navigateTo(
+                Screen.CategorySpendAnalysis(
+                    year = currentState.selectedYear,
+                    month = currentState.selectedMonth
+                )
+            )
+        }
     }
 
     private fun handleViewAllFriendsClicked() {

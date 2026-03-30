@@ -110,6 +110,15 @@ fun Navigator(
             MonthlyReportScreen(viewmodel)
         }
 
+        composable<Screen.CategorySpendAnalysis> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.CategorySpendAnalysis>()
+            ScreenPlaceholder(
+                title = "Spend by Category",
+                subtitle = "Month: ${route.month}, Year: ${route.year}",
+                navigationManager = navigationManager
+            )
+        }
+
         composable<Screen.FriendBalance> { backStackEntry ->
             val route = backStackEntry.toRoute<Screen.FriendBalance>()
             ScreenPlaceholder(
