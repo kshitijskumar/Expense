@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.example.project.domain.model.AddExpenseInput
 import org.example.project.domain.model.CategoryModel
@@ -162,6 +163,8 @@ class CategorySpendAnalysisUseCaseTest {
             useCase(3, 2024).take(2).toList(emissions)
         }
 
+        advanceUntilIdle() // let collector start and receive first emission
+
         fakeRepository.emit(
             listOf(
                 expense(1L, 100L, catFood),
@@ -169,6 +172,7 @@ class CategorySpendAnalysisUseCaseTest {
             )
         )
 
+        advanceUntilIdle() // let collector receive second emission and take(2) complete
         job.join()
 
         assertEquals(2, emissions.size)

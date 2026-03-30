@@ -1,14 +1,29 @@
 package org.example.project.feature.categoryspendanalysis.domain
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
 import org.example.project.domain.model.CategorySpendDetail
 import org.example.project.domain.repository.ExpenseRepository
+import org.example.project.util.DateTimeUtil
 
 class CategorySpendAnalysisUseCase(
     private val expenseRepository: ExpenseRepository
 ) {
     operator fun invoke(month: Int, year: Int): Flow<List<CategorySpendDetail>> {
-        return emptyFlow()
+        val (start, end) = DateTimeUtil.getMonthRange(month, year)
+        return expenseRepository.getExpensesWithParticipantsForMonthFlow(start, end)
+            .map { expenses ->
+                expenses
+                    .groupBy { it.category }
+                    .map { (category, txns) ->
+                        CategorySpendDetail(
+                            category = category,
+                            totalAmount = txns.sumOf { it.amount },
+                            transactions = txns
+                        )
+                    }
+                    .filter { it.totalAmount > 0 }
+                    .sortedByDescending { it.totalAmount }
+            }
     }
 }
