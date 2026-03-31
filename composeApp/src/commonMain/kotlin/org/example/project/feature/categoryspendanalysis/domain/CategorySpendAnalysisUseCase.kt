@@ -6,10 +6,14 @@ import org.example.project.domain.model.CategorySpendDetail
 import org.example.project.domain.repository.ExpenseRepository
 import org.example.project.util.DateTimeUtil
 
-class CategorySpendAnalysisUseCase(
+interface CategorySpendAnalysisUseCase {
+    operator fun invoke(month: Int, year: Int): Flow<List<CategorySpendDetail>>
+}
+
+class CategorySpendAnalysisUseCaseImpl(
     private val expenseRepository: ExpenseRepository
-) {
-    operator fun invoke(month: Int, year: Int): Flow<List<CategorySpendDetail>> {
+) : CategorySpendAnalysisUseCase {
+    override operator fun invoke(month: Int, year: Int): Flow<List<CategorySpendDetail>> {
         val (start, end) = DateTimeUtil.getMonthRange(month, year)
         return expenseRepository.getExpensesWithParticipantsForMonthFlow(start, end)
             .map { expenses ->

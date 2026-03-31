@@ -21,7 +21,7 @@ import kotlin.test.assertTrue
 class CategorySpendAnalysisUseCaseTest {
 
     private val fakeRepository = FakeExpenseRepository()
-    private val useCase = CategorySpendAnalysisUseCase(fakeRepository)
+    private val useCase = CategorySpendAnalysisUseCaseImpl(fakeRepository)
 
     // region Test 1 — correct month range passed to repository
 
