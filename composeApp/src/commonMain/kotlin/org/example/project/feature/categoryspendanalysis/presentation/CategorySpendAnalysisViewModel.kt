@@ -36,7 +36,7 @@ class CategorySpendAnalysisViewModel(
     }
 
     private fun handleBackClicked() {
-        // TODO: navigationManager.navigateBack()
+        navigationManager.navigateBack()
     }
 
     private fun handleCategoryRowTapped(categoryId: Long) {

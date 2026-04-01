@@ -100,11 +100,32 @@ class CategorySpendAnalysisViewModelTest {
 
     // endregion
 
-    // TODO: T4 — CategoryRowTapped on a collapsed category sets expandedCategoryId to that id
+    // region CategoryRowTapped intent
 
-    // TODO: T5 — CategoryRowTapped on the already expanded category collapses it (expandedCategoryId = null)
+    @Test
+    fun `on CategoryRowTapped intent - when no category selected - update state with tapped category`() = runTest {
+        viewModel.onIntent(CategorySpendAnalysisIntent.CategoryRowTapped(categoryId = 1L))
 
-    // TODO: T6 — CategoryRowTapped on a different category replaces the currently expanded one
+        assertEquals(1L, viewModel.state.value.expandedCategoryId)
+    }
+
+    @Test
+    fun `on CategoryRowTapped intent - when already selected category is tapped - reset expandedCategoryId to null`() = runTest {
+        viewModel.onIntent(CategorySpendAnalysisIntent.CategoryRowTapped(categoryId = 1L))
+        viewModel.onIntent(CategorySpendAnalysisIntent.CategoryRowTapped(categoryId = 1L))
+
+        assertEquals(null, viewModel.state.value.expandedCategoryId)
+    }
+
+    @Test
+    fun `on CategoryRowTapped intent - when a different category is tapped - replace expandedCategoryId with new category`() = runTest {
+        viewModel.onIntent(CategorySpendAnalysisIntent.CategoryRowTapped(categoryId = 1L))
+        viewModel.onIntent(CategorySpendAnalysisIntent.CategoryRowTapped(categoryId = 2L))
+
+        assertEquals(2L, viewModel.state.value.expandedCategoryId)
+    }
+
+    // endregion
 
     // TODO: T7 — BackClicked triggers navigation back
 
