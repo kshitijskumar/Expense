@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -13,6 +14,7 @@ import org.example.project.domain.model.CategoryModel
 import org.example.project.domain.model.CategorySpendDetail
 import org.example.project.feature.categoryspendanalysis.domain.CategorySpendAnalysisUseCase
 import org.example.project.navigation.NavigationManager
+import org.example.project.navigation.Screen
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -31,7 +33,11 @@ class CategorySpendAnalysisViewModelTest {
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = CategorySpendAnalysisViewModel(fakeUseCase, navigationManager)
+        viewModel = CategorySpendAnalysisViewModel(
+            args = Screen.CategorySpendAnalysis(year = 2024, month = 3),
+            categorySpendAnalysisUseCase = fakeUseCase,
+            navigationManager = navigationManager
+        )
     }
 
     @AfterTest
@@ -114,7 +120,7 @@ private class FakeCategorySpendAnalysisUseCase : CategorySpendAnalysisUseCase {
     var capturedYear: Int = -1
         private set
 
-    private val flow = MutableStateFlow<List<CategorySpendDetail>>(emptyList())
+    private val flow = MutableStateFlow<List<CategorySpendDetail>?>(null)
 
     fun emit(data: List<CategorySpendDetail>) {
         flow.value = data
@@ -123,7 +129,7 @@ private class FakeCategorySpendAnalysisUseCase : CategorySpendAnalysisUseCase {
     override fun invoke(month: Int, year: Int): Flow<List<CategorySpendDetail>> {
         capturedMonth = month
         capturedYear = year
-        return flow
+        return flow.filterNotNull()
     }
 }
 

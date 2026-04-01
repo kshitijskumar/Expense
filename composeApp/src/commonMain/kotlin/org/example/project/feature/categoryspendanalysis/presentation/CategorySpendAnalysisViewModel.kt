@@ -1,14 +1,22 @@
 package org.example.project.feature.categoryspendanalysis.presentation
 
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.example.project.feature.categoryspendanalysis.domain.CategorySpendAnalysisUseCase
 import org.example.project.navigation.NavigationManager
 import org.example.project.navigation.Screen
 import org.example.project.ui.base.BaseViewModel
 
 class CategorySpendAnalysisViewModel(
+    args: Screen.CategorySpendAnalysis,
     private val categorySpendAnalysisUseCase: CategorySpendAnalysisUseCase,
     private val navigationManager: NavigationManager
 ) : BaseViewModel<CategorySpendAnalysisState, CategorySpendAnalysisIntent>(CategorySpendAnalysisState()) {
+
+    init {
+        onIntent(CategorySpendAnalysisIntent.Initialise(month = args.month, year = args.year))
+    }
 
     override fun onIntent(intent: CategorySpendAnalysisIntent) {
         when (intent) {
@@ -20,7 +28,11 @@ class CategorySpendAnalysisViewModel(
     }
 
     private fun handleInitialise(month: Int, year: Int) {
-        // TODO: subscribe to categorySpendAnalysisUseCase(month, year) and update state
+        categorySpendAnalysisUseCase(month, year)
+            .onEach { details ->
+                updateState { copy(isLoading = false, categorySpendDetails = details) }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun handleBackClicked() {
