@@ -47,6 +47,6 @@ class CategorySpendAnalysisViewModel(
     }
 
     private fun handleExpenseClicked(expenseId: Long) {
-        // TODO: navigationManager.navigateTo(Screen.EditExpense(expenseId))
+        navigationManager.navigateTo(Screen.EditExpense(expenseId))
     }
 }
