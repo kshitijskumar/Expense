@@ -40,7 +40,10 @@ class CategorySpendAnalysisViewModel(
     }
 
     private fun handleCategoryRowTapped(categoryId: Long) {
-        // TODO: toggle expandedCategoryId — set to null if already expanded, else set to categoryId
+        updateState {
+            val newExpandedId = if (expandedCategoryId == categoryId) null else categoryId
+            copy(expandedCategoryId = newExpandedId)
+        }
     }
 
     private fun handleExpenseClicked(expenseId: Long) {
