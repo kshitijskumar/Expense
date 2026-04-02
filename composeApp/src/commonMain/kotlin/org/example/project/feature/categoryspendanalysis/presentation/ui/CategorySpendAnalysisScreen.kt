@@ -100,6 +100,18 @@ fun CategorySpendAnalysisScreen(
                     .fillMaxSize()
                     .wrapContentSize(Alignment.Center)
             )
+        } else if (state.categorySpendDetails.isEmpty()) {
+            Text(
+                text = "No expenses found for the month for analysis",
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.textSecondary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .wrapContentSize(Alignment.Center)
+                    .padding(horizontal = 32.dp)
+            )
         } else {
             LazyColumn(
                 modifier = Modifier
