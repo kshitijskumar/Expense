@@ -25,10 +25,9 @@ import org.example.project.feature.home.presentation.ui.HomeScreen
 import org.example.project.feature.categoryspendanalysis.presentation.CategorySpendAnalysisViewModel
 import org.example.project.feature.categoryspendanalysis.presentation.ui.CategorySpendAnalysisScreen
 import org.example.project.feature.monthlyreport.presentation.ui.MonthlyReportScreen
-import org.example.project.feature.category.CategorySelector
-import org.example.project.feature.friend.FriendSelector
 import org.example.project.feature.monthlyreport.presentation.MonthlyReportViewModel
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
@@ -68,18 +67,18 @@ fun Navigator(
         startDestination = Screen.Home
     ) {
         composable<Screen.Home> {
-            val homeViewModel: HomeViewModel = koinInject()
+            val homeViewModel: HomeViewModel = koinViewModel()
             HomeScreen(viewModel = homeViewModel, navigationManager = navigationManager)
         }
 
         composable<Screen.AddExpense> {
-            val viewModel: AddExpenseViewModel = koinInject()
+            val viewModel: AddExpenseViewModel = koinViewModel()
             AddExpenseScreen(viewModel = viewModel)
         }
 
         composable<Screen.EditExpense> { backStackEntry ->
             val route = backStackEntry.toRoute<Screen.EditExpense>()
-            val viewModel: EditExpenseViewModel = koinInject { parametersOf(route) }
+            val viewModel: EditExpenseViewModel = koinViewModel { parametersOf(route) }
             EditExpenseScreen(viewModel = viewModel)
         }
 
@@ -108,13 +107,13 @@ fun Navigator(
 
         composable<Screen.MonthlyReport> { backStackEntry ->
             val route = backStackEntry.toRoute<Screen.MonthlyReport>()
-            val viewmodel = koinInject<MonthlyReportViewModel> { parametersOf(route) }
+            val viewmodel = koinViewModel<MonthlyReportViewModel> { parametersOf(route) }
             MonthlyReportScreen(viewmodel)
         }
 
         composable<Screen.CategorySpendAnalysis> { backStackEntry ->
             val route = backStackEntry.toRoute<Screen.CategorySpendAnalysis>()
-            val viewModel = koinInject<CategorySpendAnalysisViewModel> { parametersOf(route) }
+            val viewModel = koinViewModel<CategorySpendAnalysisViewModel> { parametersOf(route) }
             CategorySpendAnalysisScreen(
                 viewModel = viewModel,
                 month = route.month,
