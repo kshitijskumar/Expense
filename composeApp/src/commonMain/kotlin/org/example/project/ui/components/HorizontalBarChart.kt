@@ -4,7 +4,6 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -124,23 +123,6 @@ fun HorizontalBarChart(
                 }
 
                 Spacer(Modifier.height(12.dp))
-            }
-
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Spacer(Modifier.width(labelColWidth + labelBarGap))
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    divisions.forEach { div ->
-                        Text(
-                            text = valueFormatter(div),
-                            style = labelStyle,
-                            color = colors.textTertiary
-                        )
-                    }
-                }
-                Spacer(Modifier.width(barValueGap + valueColWidth))
             }
         }
     }

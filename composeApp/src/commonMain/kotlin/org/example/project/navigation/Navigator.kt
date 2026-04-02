@@ -22,6 +22,8 @@ import org.example.project.feature.addexpense.presentation.ui.AddExpenseScreen
 import org.example.project.feature.addexpense.presentation.ui.EditExpenseScreen
 import org.example.project.feature.home.presentation.HomeViewModel
 import org.example.project.feature.home.presentation.ui.HomeScreen
+import org.example.project.feature.categoryspendanalysis.presentation.CategorySpendAnalysisViewModel
+import org.example.project.feature.categoryspendanalysis.presentation.ui.CategorySpendAnalysisScreen
 import org.example.project.feature.monthlyreport.presentation.ui.MonthlyReportScreen
 import org.example.project.feature.category.CategorySelector
 import org.example.project.feature.friend.FriendSelector
@@ -112,10 +114,11 @@ fun Navigator(
 
         composable<Screen.CategorySpendAnalysis> { backStackEntry ->
             val route = backStackEntry.toRoute<Screen.CategorySpendAnalysis>()
-            ScreenPlaceholder(
-                title = "Spend by Category",
-                subtitle = "Month: ${route.month}, Year: ${route.year}",
-                navigationManager = navigationManager
+            val viewModel = koinInject<CategorySpendAnalysisViewModel> { parametersOf(route) }
+            CategorySpendAnalysisScreen(
+                viewModel = viewModel,
+                month = route.month,
+                year = route.year
             )
         }
 
