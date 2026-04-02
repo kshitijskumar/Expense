@@ -3,6 +3,7 @@ package org.example.project.di
 import org.example.project.feature.addexpense.presentation.AddExpenseViewModel
 import org.example.project.feature.addexpense.presentation.EditExpenseViewModel
 import org.example.project.feature.home.presentation.HomeViewModel
+import org.example.project.feature.categoryspendanalysis.presentation.CategorySpendAnalysisViewModel
 import org.example.project.feature.monthlyreport.presentation.MonthlyReportViewModel
 import org.example.project.feature.category.CategorySelector
 import org.example.project.feature.friend.FriendSelector
@@ -32,6 +33,14 @@ val presentationModule = module {
         MonthlyReportViewModel(
             args = args,
             monthlyReportOrchestrator = get(),
+            navigationManager = get()
+        )
+    }
+
+    viewModel { (args: Screen.CategorySpendAnalysis) ->
+        CategorySpendAnalysisViewModel(
+            args = args,
+            categorySpendAnalysisUseCase = get(),
             navigationManager = get()
         )
     }
