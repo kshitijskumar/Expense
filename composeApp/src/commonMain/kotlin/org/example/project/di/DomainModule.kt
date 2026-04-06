@@ -10,6 +10,8 @@ import org.example.project.feature.home.domain.orchestrator.HomeOrchestrator
 import org.example.project.feature.home.domain.orchestrator.HomeOrchestratorImpl
 import org.example.project.feature.categoryspendanalysis.domain.CategorySpendAnalysisUseCase
 import org.example.project.feature.categoryspendanalysis.domain.CategorySpendAnalysisUseCaseImpl
+import org.example.project.feature.friendspendanalysis.domain.FriendSpendAnalysisUseCase
+import org.example.project.feature.friendspendanalysis.domain.FriendSpendAnalysisUseCaseImpl
 import org.example.project.feature.monthlyreport.domain.ComputeFriendSpendsUseCase
 import org.example.project.feature.monthlyreport.domain.MonthlyReportOrchestrator
 import org.example.project.feature.monthlyreport.domain.MonthlyReportOrchestratorImpl
@@ -47,6 +49,7 @@ val domainModule = module {
     factory<HomeOrchestrator> { HomeOrchestratorImpl(get(), get()) }
 
     factoryOf(::CategorySpendAnalysisUseCaseImpl) { bind<CategorySpendAnalysisUseCase>() }
+    factoryOf(::FriendSpendAnalysisUseCaseImpl) { bind<FriendSpendAnalysisUseCase>() }
     factoryOf(::ComputeFriendSpendsUseCase)
     factory<MonthlyReportOrchestrator> { MonthlyReportOrchestratorImpl(get(), get()) }
 
