@@ -130,7 +130,15 @@ class MonthlyReportViewModel(
     }
 
     private fun handleViewAllFriendsClicked() {
-        // TODO: Implement navigation to view all friends
+        val currentState = state.value
+        if (currentState.selectedMonth != null && currentState.selectedYear != null) {
+            navigationManager.navigateTo(
+                Screen.FriendSpendAnalysis(
+                    year = currentState.selectedYear,
+                    month = currentState.selectedMonth
+                )
+            )
+        }
     }
 
     private fun handleTransactionClicked(expenseId: Long) {

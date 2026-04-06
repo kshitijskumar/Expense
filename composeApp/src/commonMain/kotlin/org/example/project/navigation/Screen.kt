@@ -29,6 +29,9 @@ sealed interface Screen {
     data class CategorySpendAnalysis(val year: Int, val month: Int) : Screen
 
     @Serializable
+    data class FriendSpendAnalysis(val year: Int, val month: Int) : Screen
+
+    @Serializable
     data class FriendBalance(val friendId: Long) : Screen
     
     @Serializable

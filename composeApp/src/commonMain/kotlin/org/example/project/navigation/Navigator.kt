@@ -24,6 +24,8 @@ import org.example.project.feature.home.presentation.HomeViewModel
 import org.example.project.feature.home.presentation.ui.HomeScreen
 import org.example.project.feature.categoryspendanalysis.presentation.CategorySpendAnalysisViewModel
 import org.example.project.feature.categoryspendanalysis.presentation.ui.CategorySpendAnalysisScreen
+import org.example.project.feature.friendspendanalysis.presentation.FriendSpendAnalysisViewModel
+import org.example.project.feature.friendspendanalysis.presentation.ui.FriendSpendAnalysisScreen
 import org.example.project.feature.monthlyreport.presentation.ui.MonthlyReportScreen
 import org.example.project.feature.monthlyreport.presentation.MonthlyReportViewModel
 import org.koin.compose.koinInject
@@ -115,6 +117,16 @@ fun Navigator(
             val route = backStackEntry.toRoute<Screen.CategorySpendAnalysis>()
             val viewModel = koinViewModel<CategorySpendAnalysisViewModel> { parametersOf(route) }
             CategorySpendAnalysisScreen(
+                viewModel = viewModel,
+                month = route.month,
+                year = route.year
+            )
+        }
+
+        composable<Screen.FriendSpendAnalysis> { backStackEntry ->
+            val route = backStackEntry.toRoute<Screen.FriendSpendAnalysis>()
+            val viewModel = koinViewModel<FriendSpendAnalysisViewModel> { parametersOf(route) }
+            FriendSpendAnalysisScreen(
                 viewModel = viewModel,
                 month = route.month,
                 year = route.year
